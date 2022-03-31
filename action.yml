@@ -1,0 +1,54 @@
+name: "Shopify Actions"
+description: "A opinionated set of Github Actions to automatically create/push/preview themes on a Shopify store."
+author: "Grafikr"
+
+branding:
+  icon: "shopping-cart"
+  color: "green"
+
+inputs:
+  ACTION:
+    description: "'DEPLOYMENT_PREVIEW' (creates a PR specific Shopify theme), 'DEPLOY' (deploys to a specified theme, 'SHOPIFY_THEME_ID' must also be set), 'REMOVE_DEPLOYMENT_PREVIEW_THEME' (removes a previously created PR specific Shopify theme)"
+    required: true
+
+  GITHUB_TOKEN:
+    description: "Github authentication token that allows comments to be created on PRs (optional)"
+    required: false
+
+  SHOPIFY_STORE_URL:
+    description: "The shopify development store i.e. my-store.myshopify.com"
+    required: true
+
+  SHOPIFY_PASSWORD:
+    description: "The Shopify store's private app password used with themekit"
+    required: true
+
+  SHOPIFY_API_KEY:
+    description: "The Shopify store's private app API Key to allow theme creation and removal (if this is opted for)"
+    required: true
+
+  SHOPIFY_THEME_ID:
+    description: "If provided the theme will be deployed to this Shopify theme id. If not provided the theme will be deployed to a PR specific newly created theme."
+    required: false
+
+  SHOPIFY_THEME_DIRECTORY:
+    description: "The directory containing the Shopify theme to deploy i.e. './dist'"
+    required: true
+
+  SHOPIFY_ALLOW_LIVE_THEME_DEPLOYMENT:
+    description: "If deploying to a 'live' Shopify theme this must be set to 'true'"
+    required: false
+
+outputs:
+  THEME_NAME:
+    description: "Name the newly created theme"
+
+  THEME_ID:
+    description: "The newly created and deployed Shopify theme id"
+
+  THEME_PREVIEW_URL:
+    description: "The newly created and deployed theme preview url"
+
+runs:
+  using: "node16"
+  main: "dist/index.js"

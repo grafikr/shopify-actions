@@ -1,0 +1,10 @@
+{
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node"
+  }
+}
