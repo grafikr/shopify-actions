@@ -1,20 +1,20 @@
-import * as core from "@actions/core";
-import { ACTION } from "./inputs";
-import Preview from "./actions/preview";
+import * as core from '@actions/core';
+import { ACTION } from './inputs';
+import Preview from './actions/preview';
 
 const run = async () => {
   switch (ACTION) {
-    case "DEPLOY":
+    case 'DEPLOY':
       break;
 
-    case "PREVIEW":
+    case 'PREVIEW':
       return Preview();
 
-    case "DELETE":
+    case 'DELETE':
       break;
 
     default:
-      throw TypeError(`ACTION: "${ACTION} is not a valid action.`)
+      throw TypeError(`ACTION: "${ACTION} is not a valid action.`);
   }
 };
 

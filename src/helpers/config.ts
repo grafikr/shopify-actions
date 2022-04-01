@@ -1,5 +1,5 @@
 import fs from 'fs';
-import YAML from 'yaml'
+import YAML from 'yaml';
 
 let config;
 if (fs.existsSync('./config.yml')) {
@@ -17,4 +17,4 @@ export default config as {
     directory?: string
     ignore_files?: string[]
   }
-}
+};

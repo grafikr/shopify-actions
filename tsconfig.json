@@ -1,6 +1,7 @@
 {
-  "include": ["./**/*.ts"],
+  "include": ["./src/**/*.ts"],
   "exclude": ["node_modules"],
+  "outDir": "./dist",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "target": "es6",
