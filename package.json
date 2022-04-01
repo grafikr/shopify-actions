@@ -1,12 +1,14 @@
 {
   "scripts": {
     "lint-js": "node_modules/.bin/eslint . --ext .js,.ts",
-    "lint-tsc": "node_modules/.bin/tsc --noEmit"
+    "lint-tsc": "node_modules/.bin/tsc --noEmit",
+    "build": "ncc build src/index.ts -o dist"
   },
   "dependencies": {
     "@actions/core": "^1.0.0",
     "@actions/github": "^5.0.0",
     "@shopify/shopify-api": "^2.0.0",
+    "@vercel/ncc": "^0.33.0",
     "yaml": "^1.0.0"
   },
   "devDependencies": {

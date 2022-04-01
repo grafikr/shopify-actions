@@ -28,7 +28,8 @@ export const getThemeAssets = async (id: number) => {
 };
 
 export const createTheme = async () => {
-  const assets = await getThemeAssets(parseInt(config[SHOPIFY_ENVIRONMENT].theme_id, 10));
+  const environment = config[SHOPIFY_ENVIRONMENT];
+  const assets = await getThemeAssets(parseInt(environment.theme_id, 10));
 
   // TODO: Download everything ignored from live theme
   // TODO: Zip theme
