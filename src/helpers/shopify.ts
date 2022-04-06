@@ -1,49 +1,71 @@
-import Shopify, { DataType } from '@shopify/shopify-api';
-import { SHOPIFY_ACCESS_TOKEN, SHOPIFY_ENVIRONMENT, SHOPIFY_STORE } from '../inputs';
+import minimatch from 'minimatch';
+import axios from 'axios';
+import { THEME_KIT_ENVIRONMENT } from '../inputs';
+import transformPattern from './transformPattern';
+import { Theme, CreateTheme, Asset } from '../types/shopify';
 import config from './config';
+import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
-type Theme = {
-  id: number
-  name: string
-  created_at: string
-  updated_at: string
-  role: 'main' | 'unpublished' | 'demo' | 'development'
-  theme_store_id: number
-  previewable: boolean
-  processing: boolean
-};
+const environment = config[THEME_KIT_ENVIRONMENT];
 
-type Asset = {
+// https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
+const isThemeKitEnvironment = isThemeKitToken(environment.password);
 
-};
+const client = axios.create({
+  baseURL: isThemeKitEnvironment
+    ? themeKitBaseURL()
+    : shopifyBaseURL(environment.store),
+  headers: {
+    'X-Shopify-Access-Token': environment.password,
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...isThemeKitEnvironment ? {
+      'X-Shopify-Shop': environment.store,
+    } : {},
+  },
+});
 
-const client = new Shopify.Clients.Rest(SHOPIFY_STORE, SHOPIFY_ACCESS_TOKEN);
+export const createTheme = async (theme: CreateTheme) => client.post('themes.json', {
+  theme,
+}).then((response) => response.data as { theme: Theme });
+
+export const deleteTheme = async (id: number) => client.delete(`themes/${id}.json`);
 
 export const getThemeAssets = async (id: number) => {
-  const data = await client.get({
-    path: `themes/${id}/assets`,
-  }).then((response) => response.body) as { assets: Asset[] };
+  const response = await client.get(`themes/${id}/assets.json`);
 
-  return data.assets;
+  return response.data.assets as Asset[];
 };
 
-export const createTheme = async () => {
-  const environment = config[SHOPIFY_ENVIRONMENT];
-  const assets = await getThemeAssets(parseInt(environment.theme_id, 10));
-
-  // TODO: Download everything ignored from live theme
-  // TODO: Zip theme
-  // TODO: Upload to server. ngrok/http-server?
-
-  return client.post({
-    path: 'themes',
-    data: {
-      theme: {
-        name: 'Lemongrass',
-        src: 'https://themes.shopify.com/theme.zip',
-        role: 'development',
-      },
-    },
-    type: DataType.JSON,
+export const getAsset = async (theme_id: number, key: string) => {
+  const response = await client.get(`themes/${theme_id}/assets.json`, {
+    params: { 'asset[key]': key },
   });
+
+  return response.data.asset as Asset;
 };
+
+export const getIgnoredAssets = async (id: number, patterns: string[]) => {
+  const assets = (await getThemeAssets(id)).filter((asset) => {
+    for (let i = 0; i < patterns.length; i += 1) {
+      const pattern = transformPattern(patterns[i]);
+
+      if (minimatch(asset.key, pattern)) return true;
+    }
+
+    return false;
+  });
+
+  const promises = [];
+  assets.forEach((asset) => {
+    const promise = getAsset(id, asset.key);
+
+    promises.push(promise);
+  });
+
+  return Promise.all(promises);
+};
+
+export const getPreviewURL = (id: number) => `https://${environment.store}?preview_theme_id=${id}`;
+
+export const getCustomizeURL = (id: number) => `https://${environment.store}/admin/themes/${id}/editor`;
