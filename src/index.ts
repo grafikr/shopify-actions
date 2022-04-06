@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import { ACTION } from './inputs';
 import Preview from './actions/preview';
+import Delete from './actions/delete';
 
 const run = async () => {
   switch (ACTION) {
@@ -11,7 +12,7 @@ const run = async () => {
       return Preview();
 
     case 'DELETE':
-      break;
+      return Delete();
 
     default:
       throw TypeError(`ACTION: "${ACTION} is not a valid action.`);
