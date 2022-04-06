@@ -63409,9 +63409,6 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     return external_path_default().resolve('build.zip');
 }));
 
-// EXTERNAL MODULE: external "http"
-var external_http_ = __nccwpck_require__(3685);
-var external_http_default = /*#__PURE__*/__nccwpck_require__.n(external_http_);
 // EXTERNAL MODULE: ./node_modules/ngrok/index.js
 var ngrok = __nccwpck_require__(8642);
 var ngrok_default = /*#__PURE__*/__nccwpck_require__.n(ngrok);
@@ -63426,27 +63423,38 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     });
 };
 
-
-
-
 /* harmony default export */ const upload_zip = ((path, data) => upload_zip_awaiter(void 0, void 0, void 0, function* () {
     // Start tunnel
-    const server = external_http_default().createServer((request, response) => {
-        const stat = lib_default().statSync(path);
-        response.writeHead(200, {
-            'Content-Type': 'application/zip',
-            'Content-Length': stat.size,
-        });
-        const stream = lib_default().createReadStream(path);
-        stream.pipe(response);
-    }).listen(8080);
-    // Send create theme request
-    const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, data));
-    // Close tunnel
-    server.close();
-    server.emit('close');
-    yield ngrok_default().kill();
-    return response.theme.id;
+    /* const server = http.createServer((request, response) => {
+      const stat = fs.statSync(path);
+  
+      response.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Length': stat.size,
+      });
+  
+      const stream = fs.createReadStream(path);
+      stream.pipe(response);
+    }).listen(8080); */
+    console.log({ path, data });
+    const url = (yield ngrok_default().connect(8080)).replace('https://', 'http://');
+    console.log(url);
+    return 123;
+    /*
+      // Send create theme request
+      const response = await createTheme({
+        src: (await ngrok.connect(8080)).replace('https://', 'http://'),
+        ...data,
+      });
+    
+      // Close tunnel
+      server.close();
+      server.emit('close');
+    
+      await ngrok.kill();
+    
+      return response.theme.id;
+     */
 }));
 
 ;// CONCATENATED MODULE: ./src/helpers/github.ts
