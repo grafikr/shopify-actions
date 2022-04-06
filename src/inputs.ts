@@ -9,7 +9,7 @@ export const ACTION = core.getInput('ACTION', {
 export const THEME_KIT_ENVIRONMENT: string = core.getInput('THEME_KIT_ENVIRONMENT', {
   required: false,
   trimWhitespace: true,
-}) ?? 'development';
+}) || 'development';
 
 export const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
   required: false,

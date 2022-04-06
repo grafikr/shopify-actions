@@ -63228,16 +63228,16 @@ __nccwpck_require__.r(__webpack_exports__);
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
 ;// CONCATENATED MODULE: ./src/inputs.ts
-var _a, _b;
+var _a;
 
 const ACTION = core.getInput('ACTION', {
     required: true,
     trimWhitespace: true,
 });
-const THEME_KIT_ENVIRONMENT = (_a = core.getInput('THEME_KIT_ENVIRONMENT', {
+const THEME_KIT_ENVIRONMENT = core.getInput('THEME_KIT_ENVIRONMENT', {
     required: false,
     trimWhitespace: true,
-})) !== null && _a !== void 0 ? _a : 'development';
+}) || 'development';
 const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
     required: false,
     trimWhitespace: true,
@@ -63245,10 +63245,10 @@ const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN', {
     required: true,
 });
-const BUILD_DIR = (_b = core.getInput('GITHUB_TOKEN', {
+const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
     required: false,
     trimWhitespace: true,
-})) !== null && _b !== void 0 ? _b : 'build';
+})) !== null && _a !== void 0 ? _a : 'build';
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var lib_github = __nccwpck_require__(5438);
@@ -63366,6 +63366,7 @@ const getCustomizeURL = (id) => `https://${environment.store}/admin/themes/${id}
 
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: ./node_modules/fs-extra/lib/index.js
 var lib = __nccwpck_require__(5630);
 var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
@@ -63410,7 +63411,7 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     archive.pipe(zip);
     archive.directory(BUILD_DIR, false);
     yield archive.finalize();
-    return __nccwpck_require__.ab + "build.zip";
+    return external_path_default().resolve('build.zip');
 }));
 
 // EXTERNAL MODULE: external "http"
