@@ -25,6 +25,7 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
     console.log(url);
   } catch (error) {
     console.log(error.message);
+    console.log(error);
 
     throw error;
   }
