@@ -13,7 +13,7 @@ export const THEME_KIT_ENVIRONMENT: string = core.getInput('THEME_KIT_ENVIRONMEN
 export const SHOPIFY_THEME_ROLE: string = core.getInput('SHOPIFY_THEME_ROLE', {
   required: false,
   trimWhitespace: true,
-}) ?? 'development';
+}) ?? 'development' as 'PREVIEW' | 'DEPLOY' | 'DELETE';
 
 export const GITHUB_TOKEN: string = core.getInput('GITHUB_TOKEN', {
   required: true,
