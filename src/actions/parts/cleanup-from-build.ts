@@ -1,6 +1,5 @@
 import fs from 'fs-extra';
 
-export default async (buildDir, zipFilePath) => {
+export default async (buildDir) => {
   await fs.remove(buildDir);
-  await fs.remove(zipFilePath);
 };

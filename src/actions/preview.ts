@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
 import { getCustomizeURL, getPreviewURL } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
-import uploadZip from './parts/upload-zip';
+import createTheme from './parts/create-theme';
 import { createComment } from '../helpers/github';
 import cleanupFromBuild from './parts/cleanup-from-build';
 
@@ -14,9 +14,9 @@ export default async () => {
       role: SHOPIFY_THEME_ROLE,
     };
 
-    const zipFilePath = await buildFromEnvironment();
-    const themeID = await uploadZip(zipFilePath, themeData);
-    await cleanupFromBuild(BUILD_DIR, zipFilePath);
+    await buildFromEnvironment();
+    const themeID = await createTheme(themeData);
+    await cleanupFromBuild(BUILD_DIR);
 
     const previewURL = getPreviewURL(themeID);
     const customizeURL = getCustomizeURL(themeID);
