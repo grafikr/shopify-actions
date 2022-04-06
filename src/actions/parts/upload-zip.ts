@@ -19,6 +19,11 @@ export default async (path: string, config: { name: string, role: ThemeRole }): 
   });
   server.listen(8080);
 
+  const sockets = [];
+  server.on('connection', (socket) => {
+    sockets.push(socket);
+  });
+
   // Send create theme request
   const response = await createTheme({
     src: (await ngrok.connect(8080)).replace('https://', 'http://'),
@@ -27,6 +32,10 @@ export default async (path: string, config: { name: string, role: ThemeRole }): 
 
   // Close tunnel
   server.close();
+  sockets.forEach((socket) => {
+    socket.destroy();
+  });
+
   await ngrok.kill();
 
   return response.theme.id;
