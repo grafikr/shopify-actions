@@ -63313,11 +63313,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-// eslint-disable-next-line no-console
-console.log({
-    config: helpers_config,
-    THEME_KIT_ENVIRONMENT: THEME_KIT_ENVIRONMENT,
-});
 const environment = helpers_config[THEME_KIT_ENVIRONMENT];
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
 const isThemeKitEnvironment = isThemeKitToken(environment.password);

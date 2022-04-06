@@ -6,12 +6,6 @@ import { Theme, CreateTheme, Asset } from '../types/shopify';
 import config from './config';
 import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
-// eslint-disable-next-line no-console
-console.log({
-  config,
-  THEME_KIT_ENVIRONMENT,
-});
-
 const environment = config[THEME_KIT_ENVIRONMENT];
 
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
