@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import { ThemeRole } from './types/shopify';
 
 export const ACTION = core.getInput('ACTION', {
   required: true,
@@ -10,10 +11,10 @@ export const THEME_KIT_ENVIRONMENT: string = core.getInput('THEME_KIT_ENVIRONMEN
   trimWhitespace: true,
 }) ?? 'development';
 
-export const SHOPIFY_THEME_ROLE: string = core.getInput('SHOPIFY_THEME_ROLE', {
+export const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
   required: false,
   trimWhitespace: true,
-}) ?? 'development' as 'PREVIEW' | 'DEPLOY' | 'DELETE';
+}) as ThemeRole || 'development';
 
 export const GITHUB_TOKEN: string = core.getInput('GITHUB_TOKEN', {
   required: true,
