@@ -63443,6 +63443,7 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     }
     catch (error) {
         console.log(error.message);
+        console.log(error.code);
         console.log(error);
         throw error;
     }
