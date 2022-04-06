@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import ngrok from 'ngrok';
 import { createTheme } from '../../helpers/shopify';
 import { ThemeRole } from '../../types/shopify';
+import { updateNgrokBinary } from '../../helpers/ngrok';
 
 export default async (path: string, data: { name: string, role: ThemeRole }): Promise<number> => {
   // Start tunnel
@@ -19,6 +20,8 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
   }).listen(8080); */
 
   console.log({ path, data });
+
+  await updateNgrokBinary();
 
   try {
     const url = (await ngrok.connect(8080)).replace('https://', 'http://');
