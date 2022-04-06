@@ -4,7 +4,7 @@ import ngrok from 'ngrok';
 import { createTheme } from '../../helpers/shopify';
 import { ThemeRole } from '../../types/shopify';
 
-export default async (path: string, config: { name: string, role: ThemeRole }): Promise<number> => {
+export default async (path: string, data: { name: string, role: ThemeRole }): Promise<number> => {
   // Start tunnel
   const server = http.createServer((request, response) => {
     const stat = fs.statSync(path);
@@ -16,13 +16,12 @@ export default async (path: string, config: { name: string, role: ThemeRole }): 
 
     const stream = fs.createReadStream(path);
     stream.pipe(response);
-  });
-  server.listen(8080);
+  }).listen(8080);
 
   // Send create theme request
   const response = await createTheme({
     src: (await ngrok.connect(8080)).replace('https://', 'http://'),
-    ...config,
+    ...data,
   });
 
   // Close tunnel

@@ -63324,9 +63324,9 @@ const client = axios_default().create({
         'X-Shopify-Shop': environment.store,
     } : {}),
 });
-const createTheme = (theme) => __awaiter(void 0, void 0, void 0, function* () {
+const createTheme = (data) => __awaiter(void 0, void 0, void 0, function* () {
     return client.post('themes.json', {
-        theme,
+        theme: data,
     }).then((response) => response.data);
 });
 const deleteTheme = (id) => __awaiter(void 0, void 0, void 0, function* () { return client.delete(`themes/${id}.json`); });
@@ -63429,7 +63429,7 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
 
 
 
-/* harmony default export */ const upload_zip = ((path, config) => upload_zip_awaiter(void 0, void 0, void 0, function* () {
+/* harmony default export */ const upload_zip = ((path, data) => upload_zip_awaiter(void 0, void 0, void 0, function* () {
     // Start tunnel
     const server = external_http_default().createServer((request, response) => {
         const stat = lib_default().statSync(path);
@@ -63439,10 +63439,9 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
         });
         const stream = lib_default().createReadStream(path);
         stream.pipe(response);
-    });
-    server.listen(8080);
+    }).listen(8080);
     // Send create theme request
-    const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, config));
+    const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, data));
     // Close tunnel
     server.close();
     server.emit('close');
@@ -63475,6 +63474,22 @@ const updateComment = (commentID, body) => github_awaiter(void 0, void 0, void 0
     octokit.rest.issues.updateComment(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number, comment_id: commentID, body }));
 });
 
+;// CONCATENATED MODULE: ./src/actions/parts/cleanup-from-build.ts
+var cleanup_from_build_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+/* harmony default export */ const cleanup_from_build = ((buildDir, zipFilePath) => cleanup_from_build_awaiter(void 0, void 0, void 0, function* () {
+    yield lib_default().remove(buildDir);
+    yield lib_default().remove(zipFilePath);
+}));
+
 ;// CONCATENATED MODULE: ./src/actions/preview.ts
 var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -63492,13 +63507,16 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
+
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
-        const zipFilePath = yield build_from_environment();
-        const themeID = yield upload_zip(zipFilePath, {
+        const themeData = {
             name: `[PR] ${lib_github.context.eventName}`,
             role: SHOPIFY_THEME_ROLE,
-        });
+        };
+        const zipFilePath = yield build_from_environment();
+        const themeID = yield upload_zip(zipFilePath, themeData);
+        yield cleanup_from_build(BUILD_DIR, zipFilePath);
         const previewURL = getPreviewURL(themeID);
         const customizeURL = getCustomizeURL(themeID);
         yield createComment(`#### Theme preview

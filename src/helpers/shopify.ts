@@ -25,8 +25,8 @@ const client = axios.create({
   },
 });
 
-export const createTheme = async (theme: CreateTheme) => client.post('themes.json', {
-  theme,
+export const createTheme = async (data: CreateTheme) => client.post('themes.json', {
+  theme: data,
 }).then((response) => response.data as { theme: Theme });
 
 export const deleteTheme = async (id: number) => client.delete(`themes/${id}.json`);
