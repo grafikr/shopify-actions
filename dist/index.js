@@ -63437,8 +63437,14 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
       stream.pipe(response);
     }).listen(8080); */
     console.log({ path, data });
-    const url = (yield ngrok_default().connect(8080)).replace('https://', 'http://');
-    console.log(url);
+    try {
+        const url = (yield ngrok_default().connect(8080)).replace('https://', 'http://');
+        console.log(url);
+    }
+    catch (error) {
+        console.log(error.message);
+        throw error;
+    }
     return 123;
     /*
       // Send create theme request

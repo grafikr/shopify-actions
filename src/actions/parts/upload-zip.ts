@@ -20,8 +20,14 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
 
   console.log({ path, data });
 
-  const url = (await ngrok.connect(8080)).replace('https://', 'http://');
-  console.log(url);
+  try {
+    const url = (await ngrok.connect(8080)).replace('https://', 'http://');
+    console.log(url);
+  } catch (error) {
+    console.log(error.message);
+
+    throw error;
+  }
 
   return 123;
 
