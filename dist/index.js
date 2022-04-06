@@ -63441,17 +63441,11 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
         stream.pipe(response);
     });
     server.listen(8080);
-    const sockets = [];
-    server.on('connection', (socket) => {
-        sockets.push(socket);
-    });
     // Send create theme request
     const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, config));
     // Close tunnel
     server.close();
-    sockets.forEach((socket) => {
-        socket.destroy();
-    });
+    server.emit('close');
     yield ngrok_default().kill();
     return response.theme.id;
 }));
