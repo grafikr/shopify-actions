@@ -3,6 +3,7 @@
   "exclude": ["node_modules", "dist"],
   "outDir": "./dist",
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "target": "es2015",
     "moduleResolution": "node"
   }
