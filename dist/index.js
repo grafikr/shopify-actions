@@ -71847,6 +71847,9 @@ __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(2186);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(7147);
+var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
 ;// CONCATENATED MODULE: ./src/inputs.ts
 var _a;
 
@@ -71893,22 +71896,12 @@ var axios_default = /*#__PURE__*/__nccwpck_require__.n(axios);
     return pattern;
 });
 
-// EXTERNAL MODULE: external "fs"
-var external_fs_ = __nccwpck_require__(7147);
-var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
 // EXTERNAL MODULE: ./node_modules/yaml/dist/index.js
 var dist = __nccwpck_require__(4083);
 ;// CONCATENATED MODULE: ./src/helpers/config.ts
 
 
-let config;
-if (external_fs_default().existsSync('./config.yml')) {
-    config = external_fs_default().readFileSync('./config.yml', 'utf8');
-    config = dist.parse(config);
-}
-else {
-    throw new Error('Failed to find file: config.yml');
-}
+const config = dist.parse(external_fs_default().readFileSync('./config.yml', 'utf8'));
 /* harmony default export */ const helpers_config = (config);
 
 // EXTERNAL MODULE: ./node_modules/@shopify/themekit/index.js
@@ -72289,7 +72282,14 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 
 
 
+
 const run = () => src_awaiter(void 0, void 0, void 0, function* () {
+    if (external_fs_default().existsSync('./config.yml')) {
+        external_fs_default().readFileSync('./config.yml', 'utf8');
+    }
+    else {
+        throw new Error('"config.yml" was not found. No commands has been run.');
+    }
     switch (ACTION) {
         case 'DEPLOY':
             break;
