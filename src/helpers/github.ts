@@ -11,13 +11,11 @@ export const getExistingComment = async () => {
     issue_number: context.payload.pull_request.number,
   });
 
-  core.info(JSON.stringify(comments));
-
   return comments.data.find((comment) => comment.user.login === 'github-actions[bot]' && comment.body?.startsWith('#### Theme preview'));
 };
 
 export const parseThemeID = (comment): number | null => {
-  const parsed = comment.match(/preview_theme_id=([0-9]+)/);
+  const parsed = comment.body.match(/preview_theme_id=([0-9]+)/);
 
   if (parsed[1]) {
     return parseInt(parsed[1], 10);
