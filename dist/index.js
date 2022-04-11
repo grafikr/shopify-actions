@@ -72205,23 +72205,24 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         let previewURL;
         let customizeURL;
         themeID = yield getExistingThemeIDFromComments();
+        yield build_from_environment();
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
             yield deploy_to_existing_theme(themeID);
         }
         else {
-            yield build_from_environment();
             const zipFilePath = yield create_zip_from_build();
             themeID = yield upload_zip(zipFilePath, {
                 name: `[PR] ${github.context.eventName}`,
                 role: SHOPIFY_THEME_ROLE,
             });
-            cleanup([BUILD_DIR, zipFilePath]);
+            cleanup([zipFilePath]);
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
             yield createPreviewComment(previewURL, customizeURL);
         }
+        cleanup([BUILD_DIR]);
         core.setOutput('SHOPIFY_THEME_ID', themeID);
         core.setOutput('SHOPIFY_THEME_PREVIEW_URL', previewURL);
         core.setOutput('SHOPIFY_THEME_CUSTOMIZE_URL', customizeURL);
