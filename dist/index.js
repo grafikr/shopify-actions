@@ -63251,7 +63251,7 @@ const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
 })) !== null && _a !== void 0 ? _a : 'build';
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var lib_github = __nccwpck_require__(5438);
+var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/minimatch/minimatch.js
 var minimatch = __nccwpck_require__(3973);
 var minimatch_default = /*#__PURE__*/__nccwpck_require__.n(minimatch);
@@ -63464,10 +63464,12 @@ var github_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 };
 
 
-const octokit = lib_github.getOctokit(GITHUB_TOKEN);
-const { context } = lib_github;
+
+const octokit = github.getOctokit(GITHUB_TOKEN);
+const { context } = github;
 const getExistingComment = () => github_awaiter(void 0, void 0, void 0, function* () {
     const comments = yield octokit.rest.issues.listComments(Object.assign(Object.assign({}, github.context.repo), { issue_number: context.payload.pull_request.number }));
+    core.info(JSON.stringify(comments));
     return comments.data.find((comment) => comment.body_text.startsWith('Theme created'));
 });
 const createComment = (body) => github_awaiter(void 0, void 0, void 0, function* () {
@@ -63513,8 +63515,9 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
+        yield getExistingComment();
         const themeData = {
-            name: `[PR] ${lib_github.context.eventName}`,
+            name: `[PR] ${github.context.eventName}`,
             role: SHOPIFY_THEME_ROLE,
         };
         const zipFilePath = yield build_from_environment();
