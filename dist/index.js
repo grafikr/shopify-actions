@@ -71977,6 +71977,11 @@ const client = axios_default().create({
         'X-Shopify-Shop': shopify_environment.store,
     } : {}),
 });
+const getTheme = (id) => shopify_awaiter(void 0, void 0, void 0, function* () {
+    return client.get(`themes/${id.toString()}.json`)
+        .then((response) => response.data)
+        .catch(() => null);
+});
 const createTheme = (data) => shopify_awaiter(void 0, void 0, void 0, function* () {
     return client.post('themes.json', {
         theme: data,
@@ -72114,13 +72119,6 @@ const parseThemeID = (comment) => {
     }
     return null;
 };
-const getExistingThemeIDFromComments = () => github_awaiter(void 0, void 0, void 0, function* () {
-    const comment = yield getExistingComment();
-    if (comment) {
-        return parseThemeID(comment);
-    }
-    return null;
-});
 const createPreviewComment = (previewURL, customizeURL) => github_awaiter(void 0, void 0, void 0, function* () {
     const body = `#### Theme preview
 A theme was automatically created for this issue.
@@ -72129,8 +72127,8 @@ Preview URL: [${previewURL}](${previewURL})
 Customize URL: [${customizeURL}](${customizeURL})`;
     return octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number, body }));
 });
-const updateComment = (commentID, body) => github_awaiter(void 0, void 0, void 0, function* () {
-    octokit.rest.issues.updateComment(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number, comment_id: commentID, body }));
+const deleteComment = (commentID) => github_awaiter(void 0, void 0, void 0, function* () {
+    return octokit.rest.issues.deleteComment(Object.assign(Object.assign({}, context.repo), { comment_id: commentID }));
 });
 
 ;// CONCATENATED MODULE: ./src/actions/parts/cleanup.ts
@@ -72209,8 +72207,15 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         let themeID;
         let previewURL;
         let customizeURL;
-        themeID = yield getExistingThemeIDFromComments();
         yield build_from_environment();
+        const comment = yield getExistingComment();
+        if (comment) {
+            themeID = parseThemeID(comment);
+            if ((yield getTheme(themeID)) === null) {
+                themeID = undefined;
+                yield deleteComment(comment.id);
+            }
+        }
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
@@ -72252,8 +72257,9 @@ var delete_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 
 /* harmony default export */ const actions_delete = (() => delete_awaiter(void 0, void 0, void 0, function* () {
     try {
-        const themeID = yield getExistingThemeIDFromComments();
-        if (themeID) {
+        const comment = yield getExistingComment();
+        if (comment) {
+            const themeID = parseThemeID(comment);
             yield deleteTheme(themeID);
         }
     }
