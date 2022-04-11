@@ -1,11 +1,12 @@
 import * as github from '@actions/github';
-import * as core from '@actions/core';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
 import { GITHUB_TOKEN } from '../inputs';
 
 const octokit = github.getOctokit(GITHUB_TOKEN);
 const { context } = github;
 
-export const getExistingComment = async () => {
+export const getExistingComment = async (): Promise<RestEndpointMethodTypes['issues']['listComments']['response']['data'][0]> => {
   const comments = await octokit.rest.issues.listComments({
     ...github.context.repo,
     issue_number: context.payload.pull_request.number,
@@ -19,16 +20,6 @@ export const parseThemeID = (comment): number | null => {
 
   if (parsed[1]) {
     return parseInt(parsed[1], 10);
-  }
-
-  return null;
-};
-
-export const getExistingThemeIDFromComments = async (): Promise<number | null> => {
-  const comment = await getExistingComment();
-
-  if (comment) {
-    return parseThemeID(comment);
   }
 
   return null;
@@ -48,3 +39,7 @@ Customize URL: [${customizeURL}](${customizeURL})`;
   });
 };
 
+export const deleteComment = async (commentID: number) => octokit.rest.issues.deleteComment({
+  ...context.repo,
+  comment_id: commentID,
+});

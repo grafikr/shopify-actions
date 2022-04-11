@@ -1,10 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
-import { getCustomizeURL, getPreviewURL } from '../helpers/shopify';
+import { getCustomizeURL, getPreviewURL, getTheme } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
 import uploadZip from './parts/upload-zip';
-import { createPreviewComment, getExistingThemeIDFromComments } from '../helpers/github';
+import {
+  createPreviewComment, deleteComment, getExistingComment, parseThemeID,
+} from '../helpers/github';
 import cleanup from './parts/cleanup';
 import deployToExistingTheme from './parts/deploy-to-existing-theme';
 import createZipFromBuild from './parts/create-zip-from-build';
@@ -15,9 +17,18 @@ export default async () => {
     let previewURL: string;
     let customizeURL: string;
 
-    themeID = await getExistingThemeIDFromComments();
-
     await buildFromEnvironment();
+    const comment = await getExistingComment();
+
+    if (comment) {
+      themeID = parseThemeID(comment);
+
+      if (await getTheme(themeID) === null) {
+        themeID = undefined;
+
+        await deleteComment(comment.id);
+      }
+    }
 
     if (themeID) {
       previewURL = getPreviewURL(themeID);
