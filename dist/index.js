@@ -71936,13 +71936,18 @@ const isThemeKitToken = (token) => token.startsWith('shptka_');
 const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2022-04/';
 const shopifyBaseURL = (store) => `https://${store}/admin/api/2022-04/`;
 const deploy = (themeID) => __awaiter(void 0, void 0, void 0, function* () {
-    yield themekit_default().command('deploy', {
-        noIgnore: true,
-        dir: external_path_default().resolve(BUILD_DIR),
-        password: environment.password,
-        themeid: themeID.toString(),
-        store: environment.store,
-    });
+    try {
+        yield themekit_default().command('deploy', {
+            noIgnore: true,
+            dir: external_path_default().resolve(BUILD_DIR),
+            password: environment.password,
+            themeid: themeID.toString(),
+            store: environment.store,
+        });
+    }
+    catch (e) {
+        // Do nothing
+    }
 });
 
 ;// CONCATENATED MODULE: ./src/helpers/shopify.ts
@@ -72030,7 +72035,7 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     const themeId = parseInt(environment.theme_id, 10);
     const ignoredFiles = environment.ignore_files;
     // Copy existing source directory
-    core.info(`Copying directory "${environment.directory} to "${BUILD_DIR}"`);
+    core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
     lib_default().copySync(environment.directory, BUILD_DIR, {
         filter: (src) => !src.includes('node_modules'),
