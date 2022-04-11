@@ -3786,6 +3786,222 @@ exports.request = request;
 
 /***/ }),
 
+/***/ 6390:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+/* unused reexport */ __nccwpck_require__(652);
+
+
+/***/ }),
+
+/***/ 2948:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const path = __nccwpck_require__(1017);
+
+module.exports = {
+  baseURL: 'https://shopify-themekit.s3.amazonaws.com',
+  version: '1.3.0',
+  destination: __nccwpck_require__.ab + "bin1",
+  binName: process.platform === 'win32' ? 'theme.exe' : 'theme'
+};
+
+
+/***/ }),
+
+/***/ 3786:
+/***/ ((module) => {
+
+module.exports = function logger(logLevel) {
+  let level;
+
+  switch (logLevel) {
+    case 'silent':
+      level = 0;
+      break;
+    case 'error':
+      level = 1;
+      break;
+    case 'info':
+      level = 2;
+      break;
+    case 'silly':
+      level = 3;
+      break;
+    default:
+      level = 2;
+  }
+
+  return {
+    level,
+    error(...args) {
+      if (level >= 1) {
+        console.log(...args);
+      }
+    },
+    info(...args) {
+      if (level >= 2) {
+        console.log(...args);
+      }
+    },
+    silly(...args) {
+      if (level >= 3) {
+        console.log(...args);
+      }
+    }
+  };
+};
+
+
+/***/ }),
+
+/***/ 1753:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const {spawn} = __nccwpck_require__(2081);
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+
+const config = __nccwpck_require__(2948);
+
+/**
+ * Spawns a child process to run the Theme Kit executable with given parameters
+ * @param {string[]}  args      array to pass to the executable
+ * @param {string}    cwd       directory to run command on
+ * @param {string}    logLevel  level of logging required
+ */
+function runExecutable(args, cwd, logLevel) {
+  const logger = __nccwpck_require__(3786)(logLevel);
+  return new Promise((resolve, reject) => {
+    logger.silly('Theme Kit command starting');
+    let errors = '';
+
+    const pathToExecutable = path.join(config.destination, config.binName);
+    fs.statSync(pathToExecutable);
+
+    const childProcess = spawn(pathToExecutable, args, {
+      cwd,
+      stdio: ['inherit', 'inherit', 'pipe']
+    });
+
+    childProcess.on('error', (err) => {
+      errors += err;
+      logger.error(err.toString('utf8'));
+    });
+
+    childProcess.stderr.on('data', (err) => {
+      errors += err;
+      logger.error(err.toString('utf8'));
+    });
+
+    childProcess.on('close', () => {
+      logger.silly('Theme Kit command finished');
+      if (errors) {
+        reject(errors);
+      }
+      resolve();
+    });
+  });
+}
+
+module.exports = runExecutable;
+
+
+/***/ }),
+
+/***/ 652:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const runExecutable = __nccwpck_require__(1753);
+const {getFlagArrayFromObject} = __nccwpck_require__(9191);
+
+const themekit = {
+
+  /**
+   * Runs a ThemeKit command with the runExecutable utility.
+   * Forces the --no-update-notifier flag to prevent update messages from
+   * appearing when `theme update` can't be run via CLI for this package.
+   * @param {string} cmd        Theme Kit command to run
+   * @param {Object} flagObj    flags for the Theme Kit command
+   * @param {Object} options    additional options (cwd and logLevel)
+   */
+  command(cmd, flagObj = {}, options = {cwd: process.cwd()}) {
+    const updatedFlagObj = {...flagObj, noUpdateNotifier: true};
+    const flagArr = getFlagArrayFromObject(updatedFlagObj);
+
+    return runExecutable(
+      [cmd, ...flagArr],
+      options.cwd,
+      options.logLevel || null
+    );
+  }
+};
+
+module.exports = themekit;
+
+
+/***/ }),
+
+/***/ 9191:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const fs = __nccwpck_require__(7147);
+
+/**
+ * Deletes a file from the filesystem if it exists.
+ * Does nothing if it doesn't do anything.
+ * @param {string} pathToFile  path to file to delete
+ */
+function cleanFile(pathToFile) {
+  try {
+    fs.unlinkSync(pathToFile);
+  } catch (err) {
+    switch (err.code) {
+      case 'ENOENT':
+        return;
+      default:
+        throw new Error(err);
+    }
+  }
+}
+
+/**
+ * Converts an object of obj[key] = value pairings into an
+ * array that the Theme Kit executable can understand.
+ * @param {Object} obj
+ */
+function getFlagArrayFromObject(obj) {
+  return Object.keys(obj).reduce((arr, key) => {
+    const flag = `--${key.toLowerCase()}`;
+    if (key === 'noUpdateNotifier' && typeof obj[key] === 'boolean') {
+      return obj[key] ? [...arr, '--no-update-notifier'] : arr;
+    } else if (key === 'noIgnore' && typeof obj[key] === 'boolean') {
+      return obj[key] ? [...arr, '--no-ignore'] : arr;
+    } else if (key === 'allowLive' && typeof obj[key] === 'boolean') {
+      return obj[key] ? [...arr, '--allow-live'] : arr;
+    } else if (typeof obj[key] === 'boolean') {
+      return obj[key] ? [...arr, flag] : arr;
+    } else if (key === 'ignoredFile') {
+      return [...arr, '--ignored-file', obj[key]];
+    } else if (key === 'ignoredFiles') {
+      const ignoredFiles = obj[key].reduce(
+        (files, file) => [...files, '--ignored-file', file],
+        []
+      );
+      return [...arr, ...ignoredFiles];
+    } else if (key === 'files') {
+      return [...arr, ...obj[key]];
+    } else {
+      return [...arr, flag, obj[key]];
+    }
+  }, []);
+}
+
+module.exports = {cleanFile, getFlagArrayFromObject};
+
+
+/***/ }),
+
 /***/ 7678:
 /***/ ((module, exports) => {
 
@@ -4991,7 +5207,7 @@ var Stream = __nccwpck_require__(1715);
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(6476).Buffer);
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -6266,7 +6482,7 @@ var Stream = __nccwpck_require__(1715);
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(6476).Buffer);
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -6882,7 +7098,7 @@ Writable.prototype._destroy = function (err, cb) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(6476).Buffer);
 var util = __nccwpck_require__(3837);
 
 function copyBuffer(src, target, offset) {
@@ -7075,6 +7291,75 @@ if (process.env.READABLE_STREAM === 'disable' && Stream) {
 
 /***/ }),
 
+/***/ 6476:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+/* eslint-disable node/no-deprecated-api */
+var buffer = __nccwpck_require__(4300)
+var Buffer = buffer.Buffer
+
+// alternative to using Object.keys for old browsers
+function copyProps (src, dst) {
+  for (var key in src) {
+    dst[key] = src[key]
+  }
+}
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = buffer
+} else {
+  // Copy properties from require('buffer')
+  copyProps(buffer, exports)
+  exports.Buffer = SafeBuffer
+}
+
+function SafeBuffer (arg, encodingOrOffset, length) {
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+// Copy static methods from Buffer
+copyProps(Buffer, SafeBuffer)
+
+SafeBuffer.from = function (arg, encodingOrOffset, length) {
+  if (typeof arg === 'number') {
+    throw new TypeError('Argument must not be a number')
+  }
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+SafeBuffer.alloc = function (size, fill, encoding) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  var buf = Buffer(size)
+  if (fill !== undefined) {
+    if (typeof encoding === 'string') {
+      buf.fill(fill, encoding)
+    } else {
+      buf.fill(fill)
+    }
+  } else {
+    buf.fill(0)
+  }
+  return buf
+}
+
+SafeBuffer.allocUnsafe = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return Buffer(size)
+}
+
+SafeBuffer.allocUnsafeSlow = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return buffer.SlowBuffer(size)
+}
+
+
+/***/ }),
+
 /***/ 9708:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -7104,7 +7389,7 @@ if (process.env.READABLE_STREAM === 'disable' && Stream) {
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(6476).Buffer);
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -18975,6 +19260,134 @@ module.exports["default"] = CacheableLookup;
 
 /***/ }),
 
+/***/ 4340:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const {PassThrough: PassThroughStream} = __nccwpck_require__(2781);
+
+module.exports = options => {
+	options = {...options};
+
+	const {array} = options;
+	let {encoding} = options;
+	const isBuffer = encoding === 'buffer';
+	let objectMode = false;
+
+	if (array) {
+		objectMode = !(encoding || isBuffer);
+	} else {
+		encoding = encoding || 'utf8';
+	}
+
+	if (isBuffer) {
+		encoding = null;
+	}
+
+	const stream = new PassThroughStream({objectMode});
+
+	if (encoding) {
+		stream.setEncoding(encoding);
+	}
+
+	let length = 0;
+	const chunks = [];
+
+	stream.on('data', chunk => {
+		chunks.push(chunk);
+
+		if (objectMode) {
+			length = chunks.length;
+		} else {
+			length += chunk.length;
+		}
+	});
+
+	stream.getBufferedValue = () => {
+		if (array) {
+			return chunks;
+		}
+
+		return isBuffer ? Buffer.concat(chunks, length) : chunks.join('');
+	};
+
+	stream.getBufferedLength = () => length;
+
+	return stream;
+};
+
+
+/***/ }),
+
+/***/ 7040:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+const {constants: BufferConstants} = __nccwpck_require__(4300);
+const pump = __nccwpck_require__(8341);
+const bufferStream = __nccwpck_require__(4340);
+
+class MaxBufferError extends Error {
+	constructor() {
+		super('maxBuffer exceeded');
+		this.name = 'MaxBufferError';
+	}
+}
+
+async function getStream(inputStream, options) {
+	if (!inputStream) {
+		return Promise.reject(new Error('Expected a stream'));
+	}
+
+	options = {
+		maxBuffer: Infinity,
+		...options
+	};
+
+	const {maxBuffer} = options;
+
+	let stream;
+	await new Promise((resolve, reject) => {
+		const rejectPromise = error => {
+			// Don't retrieve an oversized buffer.
+			if (error && stream.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
+				error.bufferedData = stream.getBufferedValue();
+			}
+
+			reject(error);
+		};
+
+		stream = pump(inputStream, bufferStream(options), error => {
+			if (error) {
+				rejectPromise(error);
+				return;
+			}
+
+			resolve();
+		});
+
+		stream.on('data', () => {
+			if (stream.getBufferedLength() > maxBuffer) {
+				rejectPromise(new MaxBufferError());
+			}
+		});
+	});
+
+	return stream.getBufferedValue();
+}
+
+module.exports = getStream;
+// TODO: Remove this for the next major release
+module.exports["default"] = getStream;
+module.exports.buffer = (stream, options) => getStream(stream, {...options, encoding: 'buffer'});
+module.exports.array = (stream, options) => getStream(stream, {...options, array: true});
+module.exports.MaxBufferError = MaxBufferError;
+
+
+/***/ }),
+
 /***/ 8116:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -18984,7 +19397,7 @@ module.exports["default"] = CacheableLookup;
 const EventEmitter = __nccwpck_require__(2361);
 const urlLib = __nccwpck_require__(7310);
 const normalizeUrl = __nccwpck_require__(7952);
-const getStream = __nccwpck_require__(1766);
+const getStream = __nccwpck_require__(7040);
 const CachePolicy = __nccwpck_require__(1002);
 const Response = __nccwpck_require__(9004);
 const lowercaseKeys = __nccwpck_require__(9662);
@@ -19234,46 +19647,6 @@ module.exports = CacheableRequest;
 
 /***/ }),
 
-/***/ 9372:
-/***/ ((module) => {
-
-"use strict";
-
-
-// We define these manually to ensure they're always copied
-// even if they would move up the prototype chain
-// https://nodejs.org/api/http.html#http_class_http_incomingmessage
-const knownProps = [
-	'destroy',
-	'setTimeout',
-	'socket',
-	'headers',
-	'trailers',
-	'rawHeaders',
-	'statusCode',
-	'httpVersion',
-	'httpVersionMinor',
-	'httpVersionMajor',
-	'rawTrailers',
-	'statusMessage'
-];
-
-module.exports = (fromStream, toStream) => {
-	const fromProps = new Set(Object.keys(fromStream).concat(knownProps));
-
-	for (const prop of fromProps) {
-		// Don't overwrite existing properties
-		if (prop in toStream) {
-			continue;
-		}
-
-		toStream[prop] = typeof fromStream[prop] === 'function' ? fromStream[prop].bind(fromStream) : fromStream[prop];
-	}
-};
-
-
-/***/ }),
-
 /***/ 1312:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -19281,7 +19654,7 @@ module.exports = (fromStream, toStream) => {
 
 
 const PassThrough = (__nccwpck_require__(2781).PassThrough);
-const mimicResponse = __nccwpck_require__(9372);
+const mimicResponse = __nccwpck_require__(2610);
 
 const cloneResponse = response => {
 	if (!(response && response.pipe)) {
@@ -22016,7 +22389,7 @@ formatters.O = function (v) {
 
 const {Transform, PassThrough} = __nccwpck_require__(2781);
 const zlib = __nccwpck_require__(9796);
-const mimicResponse = __nccwpck_require__(2610);
+const mimicResponse = __nccwpck_require__(3877);
 
 module.exports = response => {
 	const contentEncoding = (response.headers['content-encoding'] || '').toLowerCase();
@@ -22070,6 +22443,91 @@ module.exports = response => {
 	response.pipe(checker).pipe(decompressStream).pipe(finalStream);
 
 	return finalStream;
+};
+
+
+/***/ }),
+
+/***/ 3877:
+/***/ ((module) => {
+
+"use strict";
+
+
+// We define these manually to ensure they're always copied
+// even if they would move up the prototype chain
+// https://nodejs.org/api/http.html#http_class_http_incomingmessage
+const knownProperties = [
+	'aborted',
+	'complete',
+	'headers',
+	'httpVersion',
+	'httpVersionMinor',
+	'httpVersionMajor',
+	'method',
+	'rawHeaders',
+	'rawTrailers',
+	'setTimeout',
+	'socket',
+	'statusCode',
+	'statusMessage',
+	'trailers',
+	'url'
+];
+
+module.exports = (fromStream, toStream) => {
+	if (toStream._readableState.autoDestroy) {
+		throw new Error('The second stream must have the `autoDestroy` option set to `false`');
+	}
+
+	const fromProperties = new Set(Object.keys(fromStream).concat(knownProperties));
+
+	const properties = {};
+
+	for (const property of fromProperties) {
+		// Don't overwrite existing properties.
+		if (property in toStream) {
+			continue;
+		}
+
+		properties[property] = {
+			get() {
+				const value = fromStream[property];
+				const isFunction = typeof value === 'function';
+
+				return isFunction ? value.bind(fromStream) : value;
+			},
+			set(value) {
+				fromStream[property] = value;
+			},
+			enumerable: true,
+			configurable: false
+		};
+	}
+
+	Object.defineProperties(toStream, properties);
+
+	fromStream.once('aborted', () => {
+		toStream.destroy();
+
+		toStream.emit('aborted');
+	});
+
+	fromStream.once('close', () => {
+		if (fromStream.complete) {
+			if (toStream.readable) {
+				toStream.once('end', () => {
+					toStream.emit('close');
+				});
+			} else {
+				toStream.emit('close');
+			}
+		} else {
+			toStream.emit('close');
+		}
+	});
+
+	return toStream;
 };
 
 
@@ -25223,134 +25681,6 @@ exports.realpath = function realpath(p, cache, cb) {
     start();
   }
 };
-
-
-/***/ }),
-
-/***/ 1585:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const {PassThrough: PassThroughStream} = __nccwpck_require__(2781);
-
-module.exports = options => {
-	options = {...options};
-
-	const {array} = options;
-	let {encoding} = options;
-	const isBuffer = encoding === 'buffer';
-	let objectMode = false;
-
-	if (array) {
-		objectMode = !(encoding || isBuffer);
-	} else {
-		encoding = encoding || 'utf8';
-	}
-
-	if (isBuffer) {
-		encoding = null;
-	}
-
-	const stream = new PassThroughStream({objectMode});
-
-	if (encoding) {
-		stream.setEncoding(encoding);
-	}
-
-	let length = 0;
-	const chunks = [];
-
-	stream.on('data', chunk => {
-		chunks.push(chunk);
-
-		if (objectMode) {
-			length = chunks.length;
-		} else {
-			length += chunk.length;
-		}
-	});
-
-	stream.getBufferedValue = () => {
-		if (array) {
-			return chunks;
-		}
-
-		return isBuffer ? Buffer.concat(chunks, length) : chunks.join('');
-	};
-
-	stream.getBufferedLength = () => length;
-
-	return stream;
-};
-
-
-/***/ }),
-
-/***/ 1766:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const {constants: BufferConstants} = __nccwpck_require__(4300);
-const pump = __nccwpck_require__(8341);
-const bufferStream = __nccwpck_require__(1585);
-
-class MaxBufferError extends Error {
-	constructor() {
-		super('maxBuffer exceeded');
-		this.name = 'MaxBufferError';
-	}
-}
-
-async function getStream(inputStream, options) {
-	if (!inputStream) {
-		return Promise.reject(new Error('Expected a stream'));
-	}
-
-	options = {
-		maxBuffer: Infinity,
-		...options
-	};
-
-	const {maxBuffer} = options;
-
-	let stream;
-	await new Promise((resolve, reject) => {
-		const rejectPromise = error => {
-			// Don't retrieve an oversized buffer.
-			if (error && stream.getBufferedLength() <= BufferConstants.MAX_LENGTH) {
-				error.bufferedData = stream.getBufferedValue();
-			}
-
-			reject(error);
-		};
-
-		stream = pump(inputStream, bufferStream(options), error => {
-			if (error) {
-				rejectPromise(error);
-				return;
-			}
-
-			resolve();
-		});
-
-		stream.on('data', () => {
-			if (stream.getBufferedLength() > maxBuffer) {
-				rejectPromise(new MaxBufferError());
-			}
-		});
-	});
-
-	return stream.getBufferedValue();
-}
-
-module.exports = getStream;
-// TODO: Remove this for the next major release
-module.exports["default"] = getStream;
-module.exports.buffer = (stream, options) => getStream(stream, {...options, encoding: 'buffer'});
-module.exports.array = (stream, options) => getStream(stream, {...options, array: true});
-module.exports.MaxBufferError = MaxBufferError;
 
 
 /***/ }),
@@ -34970,7 +35300,7 @@ var Stream = __nccwpck_require__(8745);
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(5054).Buffer);
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -36245,7 +36575,7 @@ var Stream = __nccwpck_require__(8745);
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(5054).Buffer);
 var OurUint8Array = global.Uint8Array || function () {};
 function _uint8ArrayToBuffer(chunk) {
   return Buffer.from(chunk);
@@ -36861,7 +37191,7 @@ Writable.prototype._destroy = function (err, cb) {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(5054).Buffer);
 var util = __nccwpck_require__(3837);
 
 function copyBuffer(src, target, offset) {
@@ -37062,6 +37392,75 @@ if (process.env.READABLE_STREAM === 'disable' && Stream) {
 
 /***/ }),
 
+/***/ 5054:
+/***/ ((module, exports, __nccwpck_require__) => {
+
+/* eslint-disable node/no-deprecated-api */
+var buffer = __nccwpck_require__(4300)
+var Buffer = buffer.Buffer
+
+// alternative to using Object.keys for old browsers
+function copyProps (src, dst) {
+  for (var key in src) {
+    dst[key] = src[key]
+  }
+}
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = buffer
+} else {
+  // Copy properties from require('buffer')
+  copyProps(buffer, exports)
+  exports.Buffer = SafeBuffer
+}
+
+function SafeBuffer (arg, encodingOrOffset, length) {
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+// Copy static methods from Buffer
+copyProps(Buffer, SafeBuffer)
+
+SafeBuffer.from = function (arg, encodingOrOffset, length) {
+  if (typeof arg === 'number') {
+    throw new TypeError('Argument must not be a number')
+  }
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+SafeBuffer.alloc = function (size, fill, encoding) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  var buf = Buffer(size)
+  if (fill !== undefined) {
+    if (typeof encoding === 'string') {
+      buf.fill(fill, encoding)
+    } else {
+      buf.fill(fill)
+    }
+  } else {
+    buf.fill(0)
+  }
+  return buf
+}
+
+SafeBuffer.allocUnsafe = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return Buffer(size)
+}
+
+SafeBuffer.allocUnsafeSlow = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return buffer.SlowBuffer(size)
+}
+
+
+/***/ }),
+
 /***/ 4749:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -37091,7 +37490,7 @@ if (process.env.READABLE_STREAM === 'disable' && Stream) {
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(1867).Buffer);
+var Buffer = (__nccwpck_require__(5054).Buffer);
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -42690,77 +43089,32 @@ module.exports = object => {
 // We define these manually to ensure they're always copied
 // even if they would move up the prototype chain
 // https://nodejs.org/api/http.html#http_class_http_incomingmessage
-const knownProperties = [
-	'aborted',
-	'complete',
+const knownProps = [
+	'destroy',
+	'setTimeout',
+	'socket',
 	'headers',
+	'trailers',
+	'rawHeaders',
+	'statusCode',
 	'httpVersion',
 	'httpVersionMinor',
 	'httpVersionMajor',
-	'method',
-	'rawHeaders',
 	'rawTrailers',
-	'setTimeout',
-	'socket',
-	'statusCode',
-	'statusMessage',
-	'trailers',
-	'url'
+	'statusMessage'
 ];
 
 module.exports = (fromStream, toStream) => {
-	if (toStream._readableState.autoDestroy) {
-		throw new Error('The second stream must have the `autoDestroy` option set to `false`');
-	}
+	const fromProps = new Set(Object.keys(fromStream).concat(knownProps));
 
-	const fromProperties = new Set(Object.keys(fromStream).concat(knownProperties));
-
-	const properties = {};
-
-	for (const property of fromProperties) {
-		// Don't overwrite existing properties.
-		if (property in toStream) {
+	for (const prop of fromProps) {
+		// Don't overwrite existing properties
+		if (prop in toStream) {
 			continue;
 		}
 
-		properties[property] = {
-			get() {
-				const value = fromStream[property];
-				const isFunction = typeof value === 'function';
-
-				return isFunction ? value.bind(fromStream) : value;
-			},
-			set(value) {
-				fromStream[property] = value;
-			},
-			enumerable: true,
-			configurable: false
-		};
+		toStream[prop] = typeof fromStream[prop] === 'function' ? fromStream[prop].bind(fromStream) : fromStream[prop];
 	}
-
-	Object.defineProperties(toStream, properties);
-
-	fromStream.once('aborted', () => {
-		toStream.destroy();
-
-		toStream.emit('aborted');
-	});
-
-	fromStream.once('close', () => {
-		if (fromStream.complete) {
-			if (toStream.readable) {
-				toStream.once('end', () => {
-					toStream.emit('close');
-				});
-			} else {
-				toStream.emit('close');
-			}
-		} else {
-			toStream.emit('close');
-		}
-	});
-
-	return toStream;
 };
 
 
@@ -47122,7 +47476,7 @@ if (debugUtil && debugUtil.debuglog) {
 /*</replacement>*/
 
 
-var BufferList = __nccwpck_require__(2746);
+var BufferList = __nccwpck_require__(6522);
 
 var destroyImpl = __nccwpck_require__(7049);
 
@@ -49304,7 +49658,7 @@ module.exports = createReadableStreamAsyncIterator;
 
 /***/ }),
 
-/***/ 2746:
+/***/ 6522:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -51491,6 +51845,7 @@ module.exports = Response;
 /***/ 1867:
 /***/ ((module, exports, __nccwpck_require__) => {
 
+/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 /* eslint-disable node/no-deprecated-api */
 var buffer = __nccwpck_require__(4300)
 var Buffer = buffer.Buffer
@@ -51512,6 +51867,8 @@ if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow)
 function SafeBuffer (arg, encodingOrOffset, length) {
   return Buffer(arg, encodingOrOffset, length)
 }
+
+SafeBuffer.prototype = Object.create(Buffer.prototype)
 
 // Copy static methods from Buffer
 copyProps(Buffer, SafeBuffer)
@@ -51586,7 +51943,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 /*<replacement>*/
 
-var Buffer = (__nccwpck_require__(2279).Buffer);
+var Buffer = (__nccwpck_require__(1867).Buffer);
 /*</replacement>*/
 
 var isEncoding = Buffer.isEncoding || function (encoding) {
@@ -51857,78 +52214,6 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-
-/***/ }),
-
-/***/ 2279:
-/***/ ((module, exports, __nccwpck_require__) => {
-
-/*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
-/* eslint-disable node/no-deprecated-api */
-var buffer = __nccwpck_require__(4300)
-var Buffer = buffer.Buffer
-
-// alternative to using Object.keys for old browsers
-function copyProps (src, dst) {
-  for (var key in src) {
-    dst[key] = src[key]
-  }
-}
-if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
-  module.exports = buffer
-} else {
-  // Copy properties from require('buffer')
-  copyProps(buffer, exports)
-  exports.Buffer = SafeBuffer
-}
-
-function SafeBuffer (arg, encodingOrOffset, length) {
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-SafeBuffer.prototype = Object.create(Buffer.prototype)
-
-// Copy static methods from Buffer
-copyProps(Buffer, SafeBuffer)
-
-SafeBuffer.from = function (arg, encodingOrOffset, length) {
-  if (typeof arg === 'number') {
-    throw new TypeError('Argument must not be a number')
-  }
-  return Buffer(arg, encodingOrOffset, length)
-}
-
-SafeBuffer.alloc = function (size, fill, encoding) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  var buf = Buffer(size)
-  if (fill !== undefined) {
-    if (typeof encoding === 'string') {
-      buf.fill(fill, encoding)
-    } else {
-      buf.fill(fill)
-    }
-  } else {
-    buf.fill(0)
-  }
-  return buf
-}
-
-SafeBuffer.allocUnsafe = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return Buffer(size)
-}
-
-SafeBuffer.allocUnsafeSlow = function (size) {
-  if (typeof size !== 'number') {
-    throw new TypeError('Argument must be a number')
-  }
-  return buffer.SlowBuffer(size)
-}
-
 
 /***/ }),
 
@@ -53544,7 +53829,7 @@ var _validate = _interopRequireDefault(__nccwpck_require__(6900));
 
 var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(4848));
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53595,7 +53880,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 4848:
+/***/ 2746:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -53920,7 +54205,7 @@ exports.URL = exports.DNS = void 0;
 
 var _stringify = _interopRequireDefault(__nccwpck_require__(8950));
 
-var _parse = _interopRequireDefault(__nccwpck_require__(4848));
+var _parse = _interopRequireDefault(__nccwpck_require__(2746));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -63245,7 +63530,7 @@ const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN', {
     required: true,
 });
-const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
+const inputs_BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
     required: false,
     trimWhitespace: true,
 })) !== null && _a !== void 0 ? _a : 'build';
@@ -63292,13 +63577,37 @@ else {
 }
 /* harmony default export */ const helpers_config = (config);
 
+// EXTERNAL MODULE: ./node_modules/@shopify/themekit/index.js
+var themekit = __nccwpck_require__(6390);
 ;// CONCATENATED MODULE: ./src/helpers/themekit.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+
+
+const environment = helpers_config[THEME_KIT_ENVIRONMENT];
 const isThemeKitToken = (token) => token.startsWith('shptka_');
 const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2022-04/';
 const shopifyBaseURL = (store) => `https://${store}/admin/api/2022-04/`;
+const deploy = (themeID) => __awaiter(void 0, void 0, void 0, function* () {
+    yield themeKit.command('deploy', {
+        noIgnore: true,
+        dir: BUILD_DIR,
+        password: environment.password,
+        themeid: themeID.toString(),
+        store: environment.store,
+    });
+});
 
 ;// CONCATENATED MODULE: ./src/helpers/shopify.ts
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+var shopify_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -63313,34 +63622,34 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const environment = helpers_config[THEME_KIT_ENVIRONMENT];
+const shopify_environment = helpers_config[THEME_KIT_ENVIRONMENT];
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
-const isThemeKitEnvironment = isThemeKitToken(environment.password);
+const isThemeKitEnvironment = isThemeKitToken(shopify_environment.password);
 const client = axios_default().create({
     baseURL: isThemeKitEnvironment
         ? themeKitBaseURL()
-        : shopifyBaseURL(environment.store),
-    headers: Object.assign({ 'X-Shopify-Access-Token': environment.password, 'Content-Type': 'application/json', Accept: 'application/json' }, isThemeKitEnvironment ? {
-        'X-Shopify-Shop': environment.store,
+        : shopifyBaseURL(shopify_environment.store),
+    headers: Object.assign({ 'X-Shopify-Access-Token': shopify_environment.password, 'Content-Type': 'application/json', Accept: 'application/json' }, isThemeKitEnvironment ? {
+        'X-Shopify-Shop': shopify_environment.store,
     } : {}),
 });
-const createTheme = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const createTheme = (data) => shopify_awaiter(void 0, void 0, void 0, function* () {
     return client.post('themes.json', {
         theme: data,
     }).then((response) => response.data);
 });
-const deleteTheme = (id) => __awaiter(void 0, void 0, void 0, function* () { return client.delete(`themes/${id}.json`); });
-const getThemeAssets = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteTheme = (id) => shopify_awaiter(void 0, void 0, void 0, function* () { return client.delete(`themes/${id}.json`); });
+const getThemeAssets = (id) => shopify_awaiter(void 0, void 0, void 0, function* () {
     const response = yield client.get(`themes/${id}/assets.json`);
     return response.data.assets;
 });
-const getAsset = (theme_id, key) => __awaiter(void 0, void 0, void 0, function* () {
+const getAsset = (theme_id, key) => shopify_awaiter(void 0, void 0, void 0, function* () {
     const response = yield client.get(`themes/${theme_id}/assets.json`, {
         params: { 'asset[key]': key },
     });
     return response.data.asset;
 });
-const getIgnoredAssets = (id, patterns) => __awaiter(void 0, void 0, void 0, function* () {
+const getIgnoredAssets = (id, patterns) => shopify_awaiter(void 0, void 0, void 0, function* () {
     const assets = (yield getThemeAssets(id)).filter((asset) => {
         for (let i = 0; i < patterns.length; i += 1) {
             const pattern = transformPattern(patterns[i]);
@@ -63356,18 +63665,12 @@ const getIgnoredAssets = (id, patterns) => __awaiter(void 0, void 0, void 0, fun
     });
     return Promise.all(promises);
 });
-const getPreviewURL = (id) => `https://${environment.store}?preview_theme_id=${id}`;
-const getCustomizeURL = (id) => `https://${environment.store}/admin/themes/${id}/editor`;
+const getPreviewURL = (id) => `https://${shopify_environment.store}?preview_theme_id=${id}`;
+const getCustomizeURL = (id) => `https://${shopify_environment.store}/admin/themes/${id}/editor`;
 
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: ./node_modules/fs-extra/lib/index.js
 var lib = __nccwpck_require__(5630);
 var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
-// EXTERNAL MODULE: ./node_modules/archiver/index.js
-var archiver = __nccwpck_require__(3084);
-var archiver_default = /*#__PURE__*/__nccwpck_require__.n(archiver);
 ;// CONCATENATED MODULE: ./src/actions/parts/build-from-environment.ts
 var build_from_environment_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -63383,34 +63686,24 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
 
 
 
-
-
 /* harmony default export */ const build_from_environment = (() => build_from_environment_awaiter(void 0, void 0, void 0, function* () {
     const environment = helpers_config[THEME_KIT_ENVIRONMENT];
     const themeId = parseInt(environment.theme_id, 10);
     const ignoredFiles = environment.ignore_files;
     // Copy existing source directory
-    core.info(`Copying directory "${environment.directory} to "${BUILD_DIR}"`);
-    lib_default().emptyDirSync(BUILD_DIR);
-    lib_default().copySync(environment.directory, BUILD_DIR, {
+    core.info(`Copying directory "${environment.directory} to "${inputs_BUILD_DIR}"`);
+    lib_default().emptyDirSync(inputs_BUILD_DIR);
+    lib_default().copySync(environment.directory, inputs_BUILD_DIR, {
         filter: (src) => !src.includes('node_modules'),
     });
     // Copy ignored files from environment
     if (environment.ignore_files) {
         const assets = yield getIgnoredAssets(themeId, ignoredFiles);
         assets.forEach((asset) => {
-            core.info(`Copying asset with key "${asset.key}" to "${BUILD_DIR}"`);
-            lib_default().outputFileSync(`${BUILD_DIR}/${asset.key}`, asset.value);
+            core.info(`Copying asset with key "${asset.key}" to "${inputs_BUILD_DIR}"`);
+            lib_default().outputFileSync(`${inputs_BUILD_DIR}/${asset.key}`, asset.value);
         });
     }
-    // Zip build directory
-    core.info(`Creating zip file from directory "${BUILD_DIR}"`);
-    const zip = lib_default().createWriteStream('build.zip');
-    const archive = archiver_default()('zip', { zlib: { level: 9 } });
-    archive.pipe(zip);
-    archive.directory(BUILD_DIR, false);
-    yield archive.finalize();
-    return external_path_default().resolve('build.zip');
 }));
 
 // EXTERNAL MODULE: external "http"
@@ -63470,17 +63763,56 @@ const { context } = github;
 const getExistingComment = () => github_awaiter(void 0, void 0, void 0, function* () {
     const comments = yield octokit.rest.issues.listComments(Object.assign(Object.assign({}, github.context.repo), { issue_number: context.payload.pull_request.number }));
     core.info(JSON.stringify(comments));
-    return comments.data.find((comment) => comment.body_text.startsWith('Theme created'));
+    return comments.data.find((comment) => { var _a; return comment.user.login === 'github-actions[bot]' && ((_a = comment.body) === null || _a === void 0 ? void 0 : _a.startsWith('#### Theme preview')); });
 });
-const createComment = (body) => github_awaiter(void 0, void 0, void 0, function* () {
+const parseThemeID = (comment) => {
+    const parsed = comment.match(/preview_theme_id=([0-9]+)/);
+    if (parsed[1]) {
+        return parseInt(parsed[1], 10);
+    }
+    return null;
+};
+const getExistingThemeIDFromComments = () => github_awaiter(void 0, void 0, void 0, function* () {
+    const comment = yield getExistingComment();
+    core.info(JSON.stringify(comment));
+    if (comment) {
+        core.info(parseThemeID(comment).toString());
+        return parseThemeID(comment);
+    }
+    return null;
+});
+const createPreviewComment = (previewURL, customizeURL) => github_awaiter(void 0, void 0, void 0, function* () {
+    const body = `#### Theme preview
+A theme was automatically created for this issue.
+
+Preview URL: [${previewURL}](${previewURL})
+Customize URL: [${customizeURL}](${customizeURL})`;
     return octokit.rest.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number, body }));
 });
 const updateComment = (commentID, body) => github_awaiter(void 0, void 0, void 0, function* () {
     octokit.rest.issues.updateComment(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number, comment_id: commentID, body }));
 });
 
-;// CONCATENATED MODULE: ./src/actions/parts/cleanup-from-build.ts
-var cleanup_from_build_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+;// CONCATENATED MODULE: ./src/actions/parts/cleanup.ts
+
+/* harmony default export */ const cleanup = ((paths) => {
+    paths.forEach((path) => {
+        lib_default().removeSync(path);
+    });
+});
+
+;// CONCATENATED MODULE: ./src/actions/parts/deploy-to-existing-theme.ts
+/* harmony default export */ const deploy_to_existing_theme = ((themeID) => {
+});
+
+// EXTERNAL MODULE: ./node_modules/archiver/index.js
+var archiver = __nccwpck_require__(3084);
+var archiver_default = /*#__PURE__*/__nccwpck_require__.n(archiver);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
+;// CONCATENATED MODULE: ./src/actions/parts/create-zip-from-build.ts
+var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -63490,9 +63822,18 @@ var cleanup_from_build_awaiter = (undefined && undefined.__awaiter) || function 
     });
 };
 
-/* harmony default export */ const cleanup_from_build = ((buildDir, zipFilePath) => cleanup_from_build_awaiter(void 0, void 0, void 0, function* () {
-    yield lib_default().remove(buildDir);
-    yield lib_default().remove(zipFilePath);
+
+
+
+
+/* harmony default export */ const create_zip_from_build = (() => create_zip_from_build_awaiter(void 0, void 0, void 0, function* () {
+    core.info(`Creating zip file from directory "${inputs_BUILD_DIR}"`);
+    const zip = lib_default().createWriteStream('build.zip');
+    const archive = archiver_default()('zip', { zlib: { level: 9 } });
+    archive.pipe(zip);
+    archive.directory(inputs_BUILD_DIR, false);
+    yield archive.finalize();
+    return external_path_default().resolve('build.zip');
 }));
 
 ;// CONCATENATED MODULE: ./src/actions/preview.ts
@@ -63513,23 +63854,31 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
+
+
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield getExistingComment();
-        const themeData = {
-            name: `[PR] ${github.context.eventName}`,
-            role: SHOPIFY_THEME_ROLE,
-        };
-        const zipFilePath = yield build_from_environment();
-        const themeID = yield upload_zip(zipFilePath, themeData);
-        yield cleanup_from_build(BUILD_DIR, zipFilePath);
-        const previewURL = getPreviewURL(themeID);
-        const customizeURL = getCustomizeURL(themeID);
-        yield createComment(`#### Theme preview
-A theme was automatically created for this issue.
-
-Preview URL: [${previewURL}](${previewURL})
-Customize URL: [${customizeURL}](${customizeURL})`);
+        let themeID;
+        let previewURL;
+        let customizeURL;
+        themeID = yield getExistingThemeIDFromComments();
+        if (themeID) {
+            previewURL = getPreviewURL(themeID);
+            customizeURL = getCustomizeURL(themeID);
+            deploy_to_existing_theme(themeID);
+        }
+        else {
+            yield build_from_environment();
+            const zipFilePath = yield create_zip_from_build();
+            themeID = yield upload_zip(zipFilePath, {
+                name: `[PR] ${github.context.eventName}`,
+                role: SHOPIFY_THEME_ROLE,
+            });
+            cleanup([inputs_BUILD_DIR, zipFilePath]);
+            previewURL = getPreviewURL(themeID);
+            customizeURL = getCustomizeURL(themeID);
+            yield createPreviewComment(previewURL, customizeURL);
+        }
         core.setOutput('SHOPIFY_THEME_ID', themeID);
         core.setOutput('SHOPIFY_THEME_PREVIEW_URL', previewURL);
         core.setOutput('SHOPIFY_THEME_CUSTOMIZE_URL', customizeURL);
@@ -63551,13 +63900,18 @@ var delete_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 };
 
 
+
 /* harmony default export */ const actions_delete = (() => delete_awaiter(void 0, void 0, void 0, function* () {
     try {
-        // TODO: Fetch theme id.
-        yield deleteTheme(123);
+        const themeID = yield getExistingThemeIDFromComments();
+        if (themeID) {
+            yield deleteTheme(themeID);
+        }
     }
     catch (error) {
-        core.setFailed(error.message);
+        if (error.response.status !== 404) {
+            core.setFailed(error.message);
+        }
     }
 }));
 
