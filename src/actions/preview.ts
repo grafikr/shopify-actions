@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
+import path from 'path';
 import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
 import { getCustomizeURL, getPreviewURL } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
@@ -17,14 +18,14 @@ export default async () => {
 
     themeID = await getExistingThemeIDFromComments();
 
-    core.info('Theme ID:');
-    core.info(themeID.toString());
-
     if (themeID) {
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
 
-      deployToExistingTheme(themeID);
+      core.info('Path');
+      core.info(path.resolve(BUILD_DIR));
+
+      await deployToExistingTheme(themeID);
     } else {
       await buildFromEnvironment();
       const zipFilePath = await createZipFromBuild();
