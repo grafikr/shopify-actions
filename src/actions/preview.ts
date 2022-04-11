@@ -23,6 +23,9 @@ export default async () => {
     if (comment) {
       themeID = parseThemeID(comment);
 
+      core.info('What is theme?');
+      core.info(JSON.stringify(await getTheme(themeID)));
+
       if (await getTheme(themeID) === null) {
         themeID = undefined;
 
