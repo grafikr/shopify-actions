@@ -1,4 +1,5 @@
 import themeKit from '@shopify/themekit';
+import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
 import config from './config';
 
@@ -13,7 +14,7 @@ export const shopifyBaseURL = (store: string) => `https://${store}/admin/api/202
 export const deploy = async (themeID: number) => {
   await themeKit.command('deploy', {
     noIgnore: true,
-    dir: BUILD_DIR,
+    dir: path.resolve(BUILD_DIR),
     password: environment.password,
     themeid: themeID.toString(),
     store: environment.store,
