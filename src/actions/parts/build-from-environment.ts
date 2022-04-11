@@ -10,7 +10,7 @@ export default async (): Promise<void> => {
   const ignoredFiles = environment.ignore_files;
 
   // Copy existing source directory
-  core.info(`Copying directory "${environment.directory} to "${BUILD_DIR}"`);
+  core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
 
   fs.emptyDirSync(BUILD_DIR);
   fs.copySync(environment.directory, BUILD_DIR, {
