@@ -71872,6 +71872,9 @@ const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: ./node_modules/minimatch/minimatch.js
 var minimatch = __nccwpck_require__(3973);
 var minimatch_default = /*#__PURE__*/__nccwpck_require__.n(minimatch);
@@ -72150,9 +72153,6 @@ var deploy_to_existing_theme_awaiter = (undefined && undefined.__awaiter) || fun
 // EXTERNAL MODULE: ./node_modules/archiver/index.js
 var archiver = __nccwpck_require__(3084);
 var archiver_default = /*#__PURE__*/__nccwpck_require__.n(archiver);
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 ;// CONCATENATED MODULE: ./src/actions/parts/create-zip-from-build.ts
 var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -72198,18 +72198,19 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
+
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
         let themeID;
         let previewURL;
         let customizeURL;
         themeID = yield getExistingThemeIDFromComments();
-        core.info('Theme ID:');
-        core.info(themeID.toString());
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
-            deploy_to_existing_theme(themeID);
+            core.info('Path');
+            core.info(external_path_default().resolve(BUILD_DIR));
+            yield deploy_to_existing_theme(themeID);
         }
         else {
             yield build_from_environment();
