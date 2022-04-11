@@ -4,30 +4,38 @@ import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
 import { getCustomizeURL, getPreviewURL } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
 import uploadZip from './parts/upload-zip';
-import { createComment, getExistingComment } from '../helpers/github';
-import cleanupFromBuild from './parts/cleanup-from-build';
+import { createPreviewComment, getExistingThemeIDFromComments } from '../helpers/github';
+import cleanup from './parts/cleanup';
+import deployToExistingTheme from './parts/deploy-to-existing-theme';
+import createZipFromBuild from './parts/create-zip-from-build';
 
 export default async () => {
   try {
-    await getExistingComment();
+    let themeID: number;
+    let previewURL: string;
+    let customizeURL: string;
 
-    const themeData = {
-      name: `[PR] ${github.context.eventName}`,
-      role: SHOPIFY_THEME_ROLE,
-    };
+    themeID = await getExistingThemeIDFromComments();
 
-    const zipFilePath = await buildFromEnvironment();
-    const themeID = await uploadZip(zipFilePath, themeData);
-    await cleanupFromBuild(BUILD_DIR, zipFilePath);
+    if (themeID) {
+      previewURL = getPreviewURL(themeID);
+      customizeURL = getCustomizeURL(themeID);
 
-    const previewURL = getPreviewURL(themeID);
-    const customizeURL = getCustomizeURL(themeID);
+      deployToExistingTheme(themeID);
+    } else {
+      await buildFromEnvironment();
+      const zipFilePath = await createZipFromBuild();
+      themeID = await uploadZip(zipFilePath, {
+        name: `[PR] ${github.context.eventName}`,
+        role: SHOPIFY_THEME_ROLE,
+      });
+      cleanup([BUILD_DIR, zipFilePath]);
 
-    await createComment(`#### Theme preview
-A theme was automatically created for this issue.
+      previewURL = getPreviewURL(themeID);
+      customizeURL = getCustomizeURL(themeID);
 
-Preview URL: [${previewURL}](${previewURL})
-Customize URL: [${customizeURL}](${customizeURL})`);
+      await createPreviewComment(previewURL, customizeURL);
+    }
 
     core.setOutput('SHOPIFY_THEME_ID', themeID);
     core.setOutput('SHOPIFY_THEME_PREVIEW_URL', previewURL);

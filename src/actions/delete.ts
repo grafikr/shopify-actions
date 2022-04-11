@@ -1,11 +1,17 @@
 import * as core from '@actions/core';
 import { deleteTheme } from '../helpers/shopify';
+import { getExistingThemeIDFromComments } from '../helpers/github';
 
 export default async () => {
   try {
-    // TODO: Fetch theme id.
-    await deleteTheme(123);
+    const themeID = await getExistingThemeIDFromComments();
+
+    if (themeID) {
+      await deleteTheme(themeID);
+    }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error.response.status !== 404) {
+      core.setFailed(error.message);
+    }
   }
 };

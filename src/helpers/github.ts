@@ -13,14 +13,45 @@ export const getExistingComment = async () => {
 
   core.info(JSON.stringify(comments));
 
-  return comments.data.find((comment) => comment.body_text.startsWith('Theme created'));
+  return comments.data.find((comment) => comment.user.login === 'github-actions[bot]' && comment.body?.startsWith('#### Theme preview'));
 };
 
-export const createComment = async (body: string) => octokit.rest.issues.createComment({
-  ...context.repo,
-  issue_number: context.payload.pull_request.number,
-  body,
-});
+export const parseThemeID = (comment): number | null => {
+  const parsed = comment.match(/preview_theme_id=([0-9]+)/);
+
+  if (parsed[1]) {
+    return parseInt(parsed[1], 10);
+  }
+
+  return null;
+};
+
+export const getExistingThemeIDFromComments = async (): Promise<number | null> => {
+  const comment = await getExistingComment();
+
+  core.info(JSON.stringify(comment));
+
+  if (comment) {
+    core.info(parseThemeID(comment).toString());
+    return parseThemeID(comment);
+  }
+
+  return null;
+};
+
+export const createPreviewComment = async (previewURL: string, customizeURL: string) => {
+  const body = `#### Theme preview
+A theme was automatically created for this issue.
+
+Preview URL: [${previewURL}](${previewURL})
+Customize URL: [${customizeURL}](${customizeURL})`;
+
+  return octokit.rest.issues.createComment({
+    ...context.repo,
+    issue_number: context.payload.pull_request.number,
+    body,
+  });
+};
 
 export const updateComment = async (commentID: number, body: string) => {
   octokit.rest.issues.updateComment({
