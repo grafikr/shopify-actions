@@ -1,12 +1,14 @@
 import * as core from '@actions/core';
 import { deleteTheme } from '../helpers/shopify';
-import { getExistingThemeIDFromComments } from '../helpers/github';
+import { getExistingComment, parseThemeID } from '../helpers/github';
 
 export default async () => {
   try {
-    const themeID = await getExistingThemeIDFromComments();
+    const comment = await getExistingComment();
 
-    if (themeID) {
+    if (comment) {
+      const themeID = parseThemeID(comment);
+
       await deleteTheme(themeID);
     }
   } catch (error) {
