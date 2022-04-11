@@ -1,4 +1,5 @@
 import * as github from '@actions/github';
+import * as core from '@actions/core';
 import { GITHUB_TOKEN } from '../inputs';
 
 const octokit = github.getOctokit(GITHUB_TOKEN);
@@ -9,6 +10,8 @@ export const getExistingComment = async () => {
     ...github.context.repo,
     issue_number: context.payload.pull_request.number,
   });
+
+  core.info(JSON.stringify(comments));
 
   return comments.data.find((comment) => comment.body_text.startsWith('Theme created'));
 };

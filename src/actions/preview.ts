@@ -4,11 +4,13 @@ import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
 import { getCustomizeURL, getPreviewURL } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
 import uploadZip from './parts/upload-zip';
-import { createComment } from '../helpers/github';
+import { createComment, getExistingComment } from '../helpers/github';
 import cleanupFromBuild from './parts/cleanup-from-build';
 
 export default async () => {
   try {
+    await getExistingComment();
+
     const themeData = {
       name: `[PR] ${github.context.eventName}`,
       role: SHOPIFY_THEME_ROLE,
