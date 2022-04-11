@@ -1,13 +1,7 @@
 import fs from 'fs';
 import YAML from 'yaml';
 
-let config;
-if (fs.existsSync('./config.yml')) {
-  config = fs.readFileSync('./config.yml', 'utf8');
-  config = YAML.parse(config);
-} else {
-  throw new Error('Failed to find file: config.yml');
-}
+const config = YAML.parse(fs.readFileSync('./config.yml', 'utf8'));
 
 export default config as {
   [key: string]: {

@@ -1,9 +1,16 @@
 import * as core from '@actions/core';
+import fs from 'fs';
 import { ACTION } from './inputs';
 import Preview from './actions/preview';
 import Delete from './actions/delete';
 
 const run = async () => {
+  if (fs.existsSync('./config.yml')) {
+    fs.readFileSync('./config.yml', 'utf8');
+  } else {
+    throw new Error('"config.yml" was not found. No commands has been run.');
+  }
+
   switch (ACTION) {
     case 'DEPLOY':
       break;
