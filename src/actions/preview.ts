@@ -17,25 +17,28 @@ export default async () => {
 
     themeID = await getExistingThemeIDFromComments();
 
+    await buildFromEnvironment();
+
     if (themeID) {
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
 
       await deployToExistingTheme(themeID);
     } else {
-      await buildFromEnvironment();
       const zipFilePath = await createZipFromBuild();
       themeID = await uploadZip(zipFilePath, {
         name: `[PR] ${github.context.eventName}`,
         role: SHOPIFY_THEME_ROLE,
       });
-      cleanup([BUILD_DIR, zipFilePath]);
+      cleanup([zipFilePath]);
 
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
 
       await createPreviewComment(previewURL, customizeURL);
     }
+
+    cleanup([BUILD_DIR]);
 
     core.setOutput('SHOPIFY_THEME_ID', themeID);
     core.setOutput('SHOPIFY_THEME_PREVIEW_URL', previewURL);
