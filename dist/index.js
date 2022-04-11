@@ -71872,9 +71872,6 @@ const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(1017);
-var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 // EXTERNAL MODULE: ./node_modules/minimatch/minimatch.js
 var minimatch = __nccwpck_require__(3973);
 var minimatch_default = /*#__PURE__*/__nccwpck_require__.n(minimatch);
@@ -71917,6 +71914,9 @@ else {
 // EXTERNAL MODULE: ./node_modules/@shopify/themekit/index.js
 var themekit = __nccwpck_require__(6390);
 var themekit_default = /*#__PURE__*/__nccwpck_require__.n(themekit);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(1017);
+var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
 ;// CONCATENATED MODULE: ./src/helpers/themekit.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -71930,6 +71930,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+
 const environment = helpers_config[THEME_KIT_ENVIRONMENT];
 const isThemeKitToken = (token) => token.startsWith('shptka_');
 const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2022-04/';
@@ -71937,7 +71938,7 @@ const shopifyBaseURL = (store) => `https://${store}/admin/api/2022-04/`;
 const deploy = (themeID) => __awaiter(void 0, void 0, void 0, function* () {
     yield themekit_default().command('deploy', {
         noIgnore: true,
-        dir: BUILD_DIR,
+        dir: external_path_default().resolve(BUILD_DIR),
         password: environment.password,
         themeid: themeID.toString(),
         store: environment.store,
@@ -72198,7 +72199,6 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
-
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
         let themeID;
@@ -72208,8 +72208,6 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
-            core.info('Path');
-            core.info(external_path_default().resolve(BUILD_DIR));
             yield deploy_to_existing_theme(themeID);
         }
         else {
