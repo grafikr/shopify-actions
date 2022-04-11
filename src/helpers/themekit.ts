@@ -12,11 +12,15 @@ export const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/c
 export const shopifyBaseURL = (store: string) => `https://${store}/admin/api/2022-04/`;
 
 export const deploy = async (themeID: number) => {
-  await themeKit.command('deploy', {
-    noIgnore: true,
-    dir: path.resolve(BUILD_DIR),
-    password: environment.password,
-    themeid: themeID.toString(),
-    store: environment.store,
-  });
+  try {
+    await themeKit.command('deploy', {
+      noIgnore: true,
+      dir: path.resolve(BUILD_DIR),
+      password: environment.password,
+      themeid: themeID.toString(),
+      store: environment.store,
+    });
+  } catch (e) {
+    // Do nothing
+  }
 };
