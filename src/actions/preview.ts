@@ -17,6 +17,9 @@ export default async () => {
 
     themeID = await getExistingThemeIDFromComments();
 
+    core.info('Theme ID:');
+    core.info(themeID.toString());
+
     if (themeID) {
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
