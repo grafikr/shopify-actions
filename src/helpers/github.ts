@@ -27,10 +27,7 @@ export const parseThemeID = (comment): number | null => {
 export const getExistingThemeIDFromComments = async (): Promise<number | null> => {
   const comment = await getExistingComment();
 
-  core.info(JSON.stringify(comment));
-
   if (comment) {
-    core.info(parseThemeID(comment).toString());
     return parseThemeID(comment);
   }
 
