@@ -26,8 +26,6 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
 
   // Close tunnel
   server.close();
-  server.emit('close');
-
   await ngrok.kill();
 
   return response.theme.id;
