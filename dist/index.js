@@ -63448,7 +63448,6 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, data));
     // Close tunnel
     server.close();
-    server.emit('close');
     yield ngrok_default().kill();
     return response.theme.id;
 }));
