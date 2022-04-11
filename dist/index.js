@@ -72075,7 +72075,9 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
 
 
 
+
 /* harmony default export */ const upload_zip = ((path, data) => upload_zip_awaiter(void 0, void 0, void 0, function* () {
+    core.info('Creating theme from ZIP file');
     // Start tunnel
     const server = external_http_default().createServer((request, response) => {
         const stat = lib_default().statSync(path);
@@ -72150,7 +72152,9 @@ var deploy_to_existing_theme_awaiter = (undefined && undefined.__awaiter) || fun
     });
 };
 
+
 /* harmony default export */ const deploy_to_existing_theme = ((themeID) => deploy_to_existing_theme_awaiter(void 0, void 0, void 0, function* () {
+    core.info(`Deploying theme with ID "${themeID}"`);
     yield deploy(themeID);
 }));
 
@@ -72260,6 +72264,7 @@ var delete_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
         const comment = yield getExistingComment();
         if (comment) {
             const themeID = parseThemeID(comment);
+            core.info(`Deleting theme with ID "${themeID}"`);
             yield deleteTheme(themeID);
         }
     }
