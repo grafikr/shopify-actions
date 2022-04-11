@@ -48,11 +48,3 @@ Customize URL: [${customizeURL}](${customizeURL})`;
   });
 };
 
-export const updateComment = async (commentID: number, body: string) => {
-  octokit.rest.issues.updateComment({
-    ...context.repo,
-    issue_number: context.payload.pull_request.number,
-    comment_id: commentID,
-    body,
-  });
-};
