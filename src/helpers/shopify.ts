@@ -2,7 +2,7 @@ import minimatch from 'minimatch';
 import axios from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
-import { Theme, CreateTheme, Asset } from '../types/shopify';
+import { Asset, CreateTheme, Theme } from '../types/shopify';
 import config from './config';
 import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
