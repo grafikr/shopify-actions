@@ -1,10 +1,13 @@
 import http from 'http';
 import fs from 'fs-extra';
 import ngrok from 'ngrok';
+import * as core from '@actions/core';
 import { createTheme } from '../../helpers/shopify';
 import { ThemeRole } from '../../types/shopify';
 
 export default async (path: string, data: { name: string, role: ThemeRole }): Promise<number> => {
+  core.info('Creating theme from ZIP file');
+
   // Start tunnel
   const server = http.createServer((request, response) => {
     const stat = fs.statSync(path);

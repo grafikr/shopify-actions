@@ -9,6 +9,7 @@ export default async () => {
     if (comment) {
       const themeID = parseThemeID(comment);
 
+      core.info(`Deleting theme with ID "${themeID}"`);
       await deleteTheme(themeID);
     }
   } catch (error) {
