@@ -63762,11 +63762,10 @@ const octokit = github.getOctokit(GITHUB_TOKEN);
 const { context } = github;
 const getExistingComment = () => github_awaiter(void 0, void 0, void 0, function* () {
     const comments = yield octokit.rest.issues.listComments(Object.assign(Object.assign({}, github.context.repo), { issue_number: context.payload.pull_request.number }));
-    core.info(JSON.stringify(comments));
     return comments.data.find((comment) => { var _a; return comment.user.login === 'github-actions[bot]' && ((_a = comment.body) === null || _a === void 0 ? void 0 : _a.startsWith('#### Theme preview')); });
 });
 const parseThemeID = (comment) => {
-    const parsed = comment.match(/preview_theme_id=([0-9]+)/);
+    const parsed = comment.body.match(/preview_theme_id=([0-9]+)/);
     if (parsed[1]) {
         return parseInt(parsed[1], 10);
     }
