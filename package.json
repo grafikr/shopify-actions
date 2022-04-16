@@ -11,7 +11,7 @@
     "@types/archiver": "^5.0.0",
     "@types/fs-extra": "^9.0.0",
     "@vercel/ncc": "^0.33.4",
-    "archiver": "^5.0.0",
+    "archiver": "^5.3.1",
     "axios": "^0.26.0",
     "fs-extra": "^10.0.0",
     "minimatch": "^5.0.0",
