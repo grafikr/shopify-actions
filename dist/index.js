@@ -64020,12 +64020,13 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
                 }
                 continue;
             }
+            if (keyProps.hasNewlineAfterProp || utilContainsNewline.containsNewline(key)) {
+                onError(key !== null && key !== void 0 ? key : start[start.length - 1], 'MULTILINE_IMPLICIT_KEY', 'Implicit keys need to be on a single line');
+            }
         }
-        else if (((_a = keyProps.found) === null || _a === void 0 ? void 0 : _a.indent) !== bm.indent)
+        else if (((_a = keyProps.found) === null || _a === void 0 ? void 0 : _a.indent) !== bm.indent) {
             onError(offset, 'BAD_INDENT', startColMsg);
-        if (implicitKey && utilContainsNewline.containsNewline(key))
-            onError(key, // checked by containsNewline()
-            'MULTILINE_IMPLICIT_KEY', 'Implicit keys need to be on a single line');
+        }
         // key value
         const keyStart = keyProps.end;
         const keyNode = key
@@ -64853,6 +64854,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
     let comment = '';
     let commentSep = '';
     let hasNewline = false;
+    let hasNewlineAfterProp = false;
     let reqSpace = false;
     let anchor = null;
     let tag = null;
@@ -64902,6 +64904,8 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
                     commentSep += token.source;
                 atNewline = true;
                 hasNewline = true;
+                if (anchor || tag)
+                    hasNewlineAfterProp = true;
                 hasSpace = true;
                 break;
             case 'anchor':
@@ -64968,6 +64972,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
         spaceBefore,
         comment,
         hasNewline,
+        hasNewlineAfterProp,
         anchor,
         tag,
         end,
@@ -68155,7 +68160,7 @@ function includesToken(list, type) {
             return true;
     return false;
 }
-function includesNonEmpty(list) {
+function findNonEmptyIndex(list) {
     for (let i = 0; i < list.length; ++i) {
         switch (list[i].type) {
             case 'space':
@@ -68163,10 +68168,10 @@ function includesNonEmpty(list) {
             case 'newline':
                 break;
             default:
-                return true;
+                return i;
         }
     }
-    return false;
+    return -1;
 }
 function isFlowToken(token) {
     switch (token === null || token === void 0 ? void 0 : token.type) {
@@ -68493,7 +68498,7 @@ class Parser {
                     !last.sep &&
                     !last.value &&
                     last.start.length > 0 &&
-                    !includesNonEmpty(last.start) &&
+                    findNonEmptyIndex(last.start) === -1 &&
                     (token.indent === 0 ||
                         last.start.every(st => st.type !== 'comment' || st.indent < token.indent))) {
                     if (top.type === 'document')
@@ -68541,7 +68546,7 @@ class Parser {
             return yield* this.lineEnd(doc);
         switch (this.type) {
             case 'doc-start': {
-                if (includesNonEmpty(doc.start)) {
+                if (findNonEmptyIndex(doc.start) !== -1) {
                     yield* this.pop();
                     yield* this.step();
                 }
@@ -68635,17 +68640,21 @@ class Parser {
                     else
                         map.items.push({ start: [this.sourceToken] });
                 }
-                else if (it.sep)
+                else if (it.sep) {
                     it.sep.push(this.sourceToken);
-                else
+                }
+                else {
                     it.start.push(this.sourceToken);
+                }
                 return;
             case 'space':
             case 'comment':
-                if (it.value)
+                if (it.value) {
                     map.items.push({ start: [this.sourceToken] });
-                else if (it.sep)
+                }
+                else if (it.sep) {
                     it.sep.push(this.sourceToken);
+                }
                 else {
                     if (this.atIndentedComment(it.start, map.indent)) {
                         const prev = map.items[map.items.length - 2];
@@ -68662,9 +68671,7 @@ class Parser {
                 return;
         }
         if (this.indent >= map.indent) {
-            const atNextItem = !this.onKeyLine &&
-                this.indent === map.indent &&
-                (it.sep || includesNonEmpty(it.start));
+            const atNextItem = !this.onKeyLine && this.indent === map.indent && it.sep;
             // For empty nodes, assign newline-separated not indented empty tokens to following node
             let start = [];
             if (atNextItem && it.sep && !it.value) {
