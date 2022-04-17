@@ -16,7 +16,7 @@
     "fs-extra": "^10.0.0",
     "minimatch": "^5.0.0",
     "ngrok": "^4.0.0",
-    "yaml": "^2.0.0"
+    "yaml": "^2.0.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.19.0",
