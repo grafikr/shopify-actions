@@ -13,7 +13,7 @@
     "@vercel/ncc": "^0.33.4",
     "archiver": "^5.3.1",
     "axios": "^0.26.0",
-    "fs-extra": "^10.0.0",
+    "fs-extra": "^10.1.0",
     "minimatch": "^5.0.0",
     "ngrok": "^4.0.0",
     "yaml": "^2.0.1"
