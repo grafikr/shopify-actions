@@ -1,12 +1,4 @@
 module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
-  globals: {
-    Shopify: true,
-    theme: true,
-  },
   extends: [
     'airbnb-base',
     'airbnb-typescript/base',
