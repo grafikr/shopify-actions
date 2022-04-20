@@ -1,0 +1,26 @@
+name: Deploy themes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install modules
+        run: yarn # Install dependencies
+
+      - name: Compile assets
+        run: yarn production # Compile your assets
+
+      - name: Deploy themes
+        uses: grafikr/shopify-actions@v1
+        with:
+          ACTION: "DEPLOY"
+          THEME_KIT_DEPLOY_COMMAND: "--env='*-production' --allow-live"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

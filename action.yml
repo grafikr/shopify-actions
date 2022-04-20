@@ -15,6 +15,10 @@ inputs:
     description: "The Theme Kit environment to build theme from. Defaults to 'development'"
     required: false
 
+  THEME_KIT_DEPLOY_COMMAND:
+    description: "The Theme Kit command you want to use to deploy themes"
+    required: false
+
   SHOPIFY_THEME_ROLE:
     description: "The role which a newly created Shopify theme should have. Defaults to 'development'"
     required: false

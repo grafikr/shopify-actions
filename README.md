@@ -54,10 +54,11 @@ This action will delete a theme which has been created for preview. This is usua
 [Full example](./examples/delete.yml)
 
 ## Inputs
-| Input                 | Description                                                                                                                                                | Required           | Default     |
-|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|-------------|
-| ACTION                | The action you want to run.                                                                                                                                | :white_check_mark: | -           |
-| THEME_KIT_ENVIRONMENT | The "environment" in your config.yml the action should get it values from.<br/>It will use this to get the token and URL to create/delete a preview theme. | :x:                | development |
-| SHOPIFY_THEME_ROLE    | The "role" the preview theme will get.<br/>[Read more about roles](https://shopify.dev/api/admin-rest/2021-10/resources/theme#resource-object)             | :x:                | development |
-| GITHUB_TOKEN          | The Github token. Used to create comments.                                                                                                                 | :white_check_mark: | -           |
-| BUILD_DIR             | The directory where the project will be build. Should only be changed if you already use this directory.                                                   | :x:                | build       |
+| Input                    | Description                                                                                                                                                | Required           | Default     |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|-------------|
+| ACTION                   | The action you want to run.                                                                                                                                | :white_check_mark: | -           |
+| THEME_KIT_ENVIRONMENT    | The "environment" in your config.yml the action should get it values from.<br/>It will use this to get the token and URL to create/delete a preview theme. | :x:                | development |
+| THEME_KIT_DEPLOY_COMMAND | The Theme Kit command you want to use to deploy themes.<br/>E.g. '--env="*-production" --allow-live'.                                                      | :x:                | -           |
+| SHOPIFY_THEME_ROLE       | The "role" the preview theme will get.<br/>[Read more about roles](https://shopify.dev/api/admin-rest/2021-10/resources/theme#resource-object)             | :x:                | development |
+| GITHUB_TOKEN             | The Github token. Used to create comments.                                                                                                                 | :white_check_mark: | -           |
+| BUILD_DIR                | The directory where the project will be build. Should only be changed if you already use this directory.                                                   | :x:                | build       |

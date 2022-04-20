@@ -1,4 +1,5 @@
 import themeKit from '@shopify/themekit';
+import minimist from 'minimist';
 import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
 import config from './config';
@@ -11,7 +12,7 @@ export const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/c
 
 export const shopifyBaseURL = (store: string) => `https://${store}/admin/api/2022-04/`;
 
-export const deploy = async (themeID: number) => {
+export const deployTheme = async (themeID: number) => {
   try {
     await themeKit.command('deploy', {
       noIgnore: true,
@@ -20,6 +21,14 @@ export const deploy = async (themeID: number) => {
       themeid: themeID.toString(),
       store: environment.store,
     });
+  } catch (e) {
+    // Do nothing
+  }
+};
+
+export const deploy = async (args: [string]) => {
+  try {
+    themeKit.command('deploy', minimist(args));
   } catch (e) {
     // Do nothing
   }

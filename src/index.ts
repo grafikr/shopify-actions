@@ -1,6 +1,7 @@
 import * as core from '@actions/core';
 import fs from 'fs';
 import { ACTION } from './inputs';
+import Deploy from './actions/deploy';
 import Preview from './actions/preview';
 import Delete from './actions/delete';
 
@@ -13,7 +14,7 @@ const run = async () => {
 
   switch (ACTION) {
     case 'DEPLOY':
-      break;
+      return Deploy();
 
     case 'PREVIEW':
       return Preview();

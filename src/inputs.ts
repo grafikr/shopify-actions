@@ -11,6 +11,11 @@ export const THEME_KIT_ENVIRONMENT: string = core.getInput('THEME_KIT_ENVIRONMEN
   trimWhitespace: true,
 }) || 'development';
 
+export const THEME_KIT_DEPLOY_COMMAND: string = core.getInput('THEME_KIT_DEPLOY_COMMAND', {
+  required: false,
+  trimWhitespace: true,
+});
+
 export const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
   required: false,
   trimWhitespace: true,
