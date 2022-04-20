@@ -24,6 +24,8 @@ This action will deploy one or more themes using Theme Kit's `deploy` command.
 #### Preview theme
 This action will create a theme, and add a comment with preview links.
 
+This command will also download any [ignored file](https://shopify.dev/themes/tools/theme-kit/configuration-reference#ignore-patterns]) from the environment specified in the `THEME_KIT_ENVIRONMENT` input.
+
 ```yaml
 ...
 - name: Create preview
