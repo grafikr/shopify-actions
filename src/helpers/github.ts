@@ -25,6 +25,11 @@ export const parseThemeID = (comment): number | null => {
   return null;
 };
 
+export const getIssue = async () => octokit.rest.issues.get({
+  ...context.repo,
+  issue_number: context.payload.pull_request.number,
+});
+
 export const createPreviewComment = async (previewURL: string, customizeURL: string) => {
   const body = `#### Theme preview
 A theme was automatically created for this issue.

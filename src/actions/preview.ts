@@ -5,7 +5,7 @@ import { getCustomizeURL, getPreviewURL, getTheme } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
 import uploadZip from './parts/upload-zip';
 import {
-  createPreviewComment, deleteComment, getExistingComment, parseThemeID,
+  getIssue, createPreviewComment, deleteComment, getExistingComment, parseThemeID,
 } from '../helpers/github';
 import cleanup from './parts/cleanup';
 import deployToExistingTheme from './parts/deploy-to-existing-theme';
@@ -36,9 +36,10 @@ export default async () => {
 
       await deployToExistingTheme(themeID);
     } else {
+      const issue = await getIssue();
       const zipFilePath = await createZipFromBuild();
       themeID = await uploadZip(zipFilePath, {
-        name: `[PR] ${github.context.eventName}`,
+        name: `[PR] ${issue.data.title}`,
         role: SHOPIFY_THEME_ROLE,
       });
       cleanup([zipFilePath]);
