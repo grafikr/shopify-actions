@@ -71875,7 +71875,6 @@ var core = __nccwpck_require__(2186);
 var external_fs_ = __nccwpck_require__(7147);
 var external_fs_default = /*#__PURE__*/__nccwpck_require__.n(external_fs_);
 ;// CONCATENATED MODULE: ./src/inputs.ts
-var _a;
 
 const ACTION = core.getInput('ACTION', {
     required: true,
@@ -71892,10 +71891,10 @@ const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN', {
     required: true,
 });
-const BUILD_DIR = (_a = core.getInput('GITHUB_TOKEN', {
+const BUILD_DIR = core.getInput('GITHUB_TOKEN', {
     required: false,
     trimWhitespace: true,
-})) !== null && _a !== void 0 ? _a : 'build';
+}) || 'build';
 
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
