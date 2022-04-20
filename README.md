@@ -1,6 +1,6 @@
 # Shopify Actions
 
-A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores.
+A opinionated set of GitHub Actions to automatically create/push/preview themes on Shopify stores.
 
 These actions are built on top of [Theme Kit](https://shopify.dev/themes/tools/theme-kit), and expects a `config.yml` file to exist in your repository.
 
