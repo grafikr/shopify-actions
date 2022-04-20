@@ -37,7 +37,7 @@ This action will create a theme, and add a comment with preview links.
 [Full example](./examples/preview.yml)
 
 #### Delete theme
-This action will delete a theme which has been created for preview. This is usually an action you want to use when closing a PR.
+This action will delete a theme which has been created for preview. This is usually an action you want to use when closing a pull request.
 
 ```yaml
 ...
