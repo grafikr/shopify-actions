@@ -1,0 +1,24 @@
+name: Create preview
+
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: check-files
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install modules
+        run: yarn # Install dependencies
+
+      - name: Compile assets
+        run: yarn production # Compile your assets
+
+      - name: Deploy theme
+        uses: grafikr/shopify-actions@v1
+        with:
+          ACTION: "PREVIEW"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This value is by default available. No need to create a token.

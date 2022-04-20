@@ -1,0 +1,15 @@
+name: Delete preview
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete theme
+        uses: grafikr/shopify-actions@v1
+        with:
+          ACTION: "DELETE"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
