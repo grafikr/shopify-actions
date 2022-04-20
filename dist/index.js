@@ -72237,8 +72237,6 @@ var deploy_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
     }
 }));
 
-// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
-var github = __nccwpck_require__(5438);
 // EXTERNAL MODULE: ./node_modules/minimatch/minimatch.js
 var minimatch = __nccwpck_require__(3973);
 var minimatch_default = /*#__PURE__*/__nccwpck_require__.n(minimatch);
@@ -72406,6 +72404,8 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     return response.theme.id;
 }));
 
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(5438);
 ;// CONCATENATED MODULE: ./src/helpers/github.ts
 var github_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -72431,6 +72431,9 @@ const parseThemeID = (comment) => {
     }
     return null;
 };
+const getIssue = () => github_awaiter(void 0, void 0, void 0, function* () {
+    return octokit.rest.issues.get(Object.assign(Object.assign({}, context.repo), { issue_number: context.payload.pull_request.number }));
+});
 const createPreviewComment = (previewURL, customizeURL) => github_awaiter(void 0, void 0, void 0, function* () {
     const body = `#### Theme preview
 A theme was automatically created for this issue.
@@ -72515,7 +72518,6 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
-
 /* harmony default export */ const preview = (() => preview_awaiter(void 0, void 0, void 0, function* () {
     try {
         let themeID;
@@ -72536,9 +72538,10 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
             yield deploy_to_existing_theme(themeID);
         }
         else {
+            const issue = yield getIssue();
             const zipFilePath = yield create_zip_from_build();
             themeID = yield upload_zip(zipFilePath, {
-                name: `[PR] ${github.context.eventName}`,
+                name: `[PR] ${issue.data.title}`,
                 role: SHOPIFY_THEME_ROLE,
             });
             cleanup([zipFilePath]);
