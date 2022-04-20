@@ -23,4 +23,4 @@ export const GITHUB_TOKEN: string = core.getInput('GITHUB_TOKEN', {
 export const BUILD_DIR: string = core.getInput('GITHUB_TOKEN', {
   required: false,
   trimWhitespace: true,
-}) ?? 'build';
+}) || 'build';
