@@ -1,4 +1,4 @@
-name: "Shopify Actions"
+name: "Shopify Theme Kit Actions"
 description: "A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores."
 author: "Grafikr"
 
