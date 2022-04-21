@@ -1,5 +1,4 @@
 import * as core from '@actions/core';
-import * as github from '@actions/github';
 import { BUILD_DIR, SHOPIFY_THEME_ROLE } from '../inputs';
 import { getCustomizeURL, getPreviewURL, getTheme } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
