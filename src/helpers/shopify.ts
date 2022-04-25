@@ -25,7 +25,7 @@ const client = axios.create({
   },
 });
 
-export const getTheme = async (id: number): Promise<Theme | null> => client.get(`themes/${id.toString()}.json`)
+export const getTheme = async (id: number): Promise<Theme | null> => client.get(`themes/${id}.json`)
   .then((response) => response.data as Theme)
   .catch(() => null);
 
