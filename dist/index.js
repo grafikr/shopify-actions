@@ -71981,7 +71981,7 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        themekit_default().command('deploy', parse_args(args));
+        yield themekit_default().command('deploy', parse_args(args));
     }
     catch (e) {
         core.info('Theme Kit returned an error while deploying');
