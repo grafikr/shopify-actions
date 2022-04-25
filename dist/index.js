@@ -72060,9 +72060,13 @@ const client = axios_default().create({
     } : {}),
 });
 const getTheme = (id) => shopify_awaiter(void 0, void 0, void 0, function* () {
-    return client.get(`themes/${id.toString()}.json`)
+    return client.get(`themes/${id}.json`)
         .then((response) => response.data)
         .catch(() => null);
+});
+const updateTheme = (id, data) => shopify_awaiter(void 0, void 0, void 0, function* () {
+    return client.put(`themes/${id}.json`, { theme: data })
+        .then((response) => response.data);
 });
 const createTheme = (data) => shopify_awaiter(void 0, void 0, void 0, function* () {
     return client.post('themes.json', {
@@ -72273,6 +72277,23 @@ var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || functi
     return external_path_default().resolve('build.zip');
 }));
 
+;// CONCATENATED MODULE: ./src/actions/parts/rename-theme.ts
+var rename_theme_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+
+/* harmony default export */ const rename_theme = ((id, name) => rename_theme_awaiter(void 0, void 0, void 0, function* () {
+    yield updateTheme(id, {
+        name,
+    });
+}));
+
 ;// CONCATENATED MODULE: ./src/actions/preview.ts
 var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -72283,6 +72304,7 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+
 
 
 
@@ -72306,16 +72328,18 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
                 yield deleteComment(comment.id);
             }
         }
+        const issue = yield getIssue();
+        const themeName = `[PR] ${issue.data.title}`;
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
+            yield rename_theme(themeID, themeName);
             yield deploy_to_existing_theme(themeID);
         }
         else {
-            const issue = yield getIssue();
             const zipFilePath = yield create_zip_from_build();
             themeID = yield upload_zip(zipFilePath, {
-                name: `[PR] ${issue.data.title}`,
+                name: themeName,
                 role: SHOPIFY_THEME_ROLE,
             });
             cleanup([zipFilePath]);
