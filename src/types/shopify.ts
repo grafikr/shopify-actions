@@ -16,6 +16,11 @@ export type CreateTheme = {
   role: ThemeRole
 };
 
+export type UpdateTheme = {
+  name?: string
+  role?: ThemeRole
+};
+
 export type Asset = {
   key: string
 };

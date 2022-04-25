@@ -9,6 +9,7 @@ import {
 import cleanup from './parts/cleanup';
 import deployToExistingTheme from './parts/deploy-to-existing-theme';
 import createZipFromBuild from './parts/create-zip-from-build';
+import renameTheme from './parts/rename-theme';
 
 export default async () => {
   try {
@@ -29,16 +30,19 @@ export default async () => {
       }
     }
 
+    const issue = await getIssue();
+    const themeName = `[PR] ${issue.data.title}`;
+
     if (themeID) {
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
 
+      await renameTheme(themeID, themeName);
       await deployToExistingTheme(themeID);
     } else {
-      const issue = await getIssue();
       const zipFilePath = await createZipFromBuild();
       themeID = await uploadZip(zipFilePath, {
-        name: `[PR] ${issue.data.title}`,
+        name: themeName,
         role: SHOPIFY_THEME_ROLE,
       });
       cleanup([zipFilePath]);

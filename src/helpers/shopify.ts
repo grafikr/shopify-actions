@@ -2,7 +2,9 @@ import minimatch from 'minimatch';
 import axios from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
-import { Asset, CreateTheme, Theme } from '../types/shopify';
+import {
+  Asset, Theme, CreateTheme, UpdateTheme,
+} from '../types/shopify';
 import config from './config';
 import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
@@ -28,6 +30,9 @@ const client = axios.create({
 export const getTheme = async (id: number): Promise<Theme | null> => client.get(`themes/${id}.json`)
   .then((response) => response.data as Theme)
   .catch(() => null);
+
+export const updateTheme = async (id: number, data: UpdateTheme): Promise<Theme> => client.put(`themes/${id}.json`, { theme: data })
+  .then((response) => response.data as Theme);
 
 export const createTheme = async (data: CreateTheme) => client.post('themes.json', {
   theme: data,
