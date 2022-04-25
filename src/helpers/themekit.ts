@@ -28,7 +28,7 @@ export const deployTheme = async (themeID: number) => {
 
 export const deploy = async (args: string) => {
   try {
-    const objectArgs = argsParser('args-parser')([
+    const objectArgs = argsParser([
       'command',
       'file',
       args,
