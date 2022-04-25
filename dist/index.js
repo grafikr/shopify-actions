@@ -9198,14 +9198,6 @@ module.exports = Zip;
 
 /***/ }),
 
-/***/ 8108:
-/***/ ((module) => {
-
-"use strict";
-const ARGUMENT_SEPARATION_REGEX=/([^=\s]+)=?\s*(.*)/;function Parse(s){s=s.slice(2);const e={};let t,c;return s.forEach(function(s){(s=s.match(ARGUMENT_SEPARATION_REGEX)).splice(0,1),0===(t=s[0]).indexOf("-")&&(t=t.slice(t.slice(0,2).lastIndexOf("-")+1)),c=""===s[1]||(parseFloat(s[1]).toString()===s[1]?+s[1]:s[1]),e[t]=c}),e}module.exports=Parse;
-
-/***/ }),
-
 /***/ 7888:
 /***/ (function(__unused_webpack_module, exports) {
 
@@ -71911,9 +71903,6 @@ const BUILD_DIR = core.getInput('GITHUB_TOKEN', {
 // EXTERNAL MODULE: ./node_modules/@shopify/themekit/index.js
 var themekit = __nccwpck_require__(6390);
 var themekit_default = /*#__PURE__*/__nccwpck_require__.n(themekit);
-// EXTERNAL MODULE: ./node_modules/args-parser/dist/parse.min.js
-var parse_min = __nccwpck_require__(8108);
-var parse_min_default = /*#__PURE__*/__nccwpck_require__.n(parse_min);
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(1017);
 var external_path_default = /*#__PURE__*/__nccwpck_require__.n(external_path_);
@@ -71924,6 +71913,37 @@ var dist = __nccwpck_require__(4083);
 
 const config = dist.parse(external_fs_default().readFileSync('./config.yml', 'utf8'));
 /* harmony default export */ const helpers_config = (config);
+
+;// CONCATENATED MODULE: ./src/helpers/parse-args.ts
+const ARGUMENTS_SEPARATION_REGEX = /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^/\\]*(?:\\[\S\s][^/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g;
+const ARGUMENT_SEPARATION_REGEX = /([^=\s]+)=?\s*(.*)/;
+/* harmony default export */ const parse_args = ((args) => {
+    const parsed = {};
+    args.match(ARGUMENTS_SEPARATION_REGEX).forEach((arg) => {
+        const parsedArgs = arg.match(ARGUMENT_SEPARATION_REGEX);
+        parsedArgs.splice(0, 1);
+        const [key, value] = parsedArgs;
+        let parsedKey;
+        if (key.indexOf('-') === 0) {
+            parsedKey = key.slice(key.slice(0, 2).lastIndexOf('-') + 1);
+        }
+        else {
+            parsedKey = key;
+        }
+        let parsedValue;
+        if (value === '' || value === undefined) {
+            parsedValue = true;
+        }
+        else if (parseFloat(value).toString() === value) {
+            parsedValue = parseFloat(value);
+        }
+        else {
+            parsedValue = value.replace(/^["'](.+(?=["']$))["']$/, '$1');
+        }
+        parsed[parsedKey] = parsedValue;
+    });
+    return parsed;
+});
 
 ;// CONCATENATED MODULE: ./src/helpers/themekit.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -71959,12 +71979,7 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
-    const objectArgs = parse_min_default()([
-        'command',
-        'file',
-        args,
-    ]);
-    themekit_default().command('deploy', objectArgs);
+    themekit_default().command('deploy', parse_args(args));
 });
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
