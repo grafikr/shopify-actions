@@ -1,5 +1,4 @@
 import themeKit from '@shopify/themekit';
-import argsParser from 'args-parser';
 import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
 import config from './config';
