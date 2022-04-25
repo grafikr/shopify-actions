@@ -71960,7 +71960,7 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const objectArgs = parse_min_default()('args-parser')([
+        const objectArgs = parse_min_default()([
             'command',
             'file',
             args,
