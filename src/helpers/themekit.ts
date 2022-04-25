@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import themeKit from '@shopify/themekit';
 import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
@@ -27,5 +28,10 @@ export const deployTheme = async (themeID: number) => {
 };
 
 export const deploy = async (args: string) => {
-  themeKit.command('deploy', parseArgs(args));
+  try {
+    themeKit.command('deploy', parseArgs(args));
+  } catch (e) {
+    core.info('Theme Kit returned an error while deploying');
+    core.info(e.message);
+  }
 };
