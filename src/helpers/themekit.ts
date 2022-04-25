@@ -27,15 +27,11 @@ export const deployTheme = async (themeID: number) => {
 };
 
 export const deploy = async (args: string) => {
-  try {
-    const objectArgs = argsParser([
-      'command',
-      'file',
-      args,
-    ]);
+  const objectArgs = argsParser([
+    'command',
+    'file',
+    args,
+  ]);
 
-    themeKit.command('deploy', objectArgs);
-  } catch (e) {
-    // Do nothing
-  }
+  themeKit.command('deploy', objectArgs);
 };
