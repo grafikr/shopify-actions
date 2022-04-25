@@ -71960,6 +71960,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+
 const environment = helpers_config[THEME_KIT_ENVIRONMENT];
 const isThemeKitToken = (token) => token.startsWith('shptka_');
 const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2022-04/';
@@ -71979,7 +71980,13 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
-    themekit_default().command('deploy', parse_args(args));
+    try {
+        themekit_default().command('deploy', parse_args(args));
+    }
+    catch (e) {
+        core.info('Theme Kit returned an error while deploying');
+        core.info(e.message);
+    }
 });
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
