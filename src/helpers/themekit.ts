@@ -3,6 +3,7 @@ import argsParser from 'args-parser';
 import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
 import config from './config';
+import parseArgs from './parse-args';
 
 const environment = config[THEME_KIT_ENVIRONMENT];
 
@@ -27,11 +28,5 @@ export const deployTheme = async (themeID: number) => {
 };
 
 export const deploy = async (args: string) => {
-  const objectArgs = argsParser([
-    'command',
-    'file',
-    args,
-  ]);
-
-  themeKit.command('deploy', objectArgs);
+  themeKit.command('deploy', parseArgs(args));
 };
