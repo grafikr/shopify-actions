@@ -28,7 +28,10 @@ export const deployTheme = async (themeID: number) => {
 
 export const deploy = async (args: [string]) => {
   try {
-    themeKit.command('deploy', minimist(args));
+    const objectArgs = minimist(args);
+    delete (objectArgs._);
+
+    themeKit.command('deploy', objectArgs);
   } catch (e) {
     // Do nothing
   }
