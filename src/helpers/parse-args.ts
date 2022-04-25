@@ -1,7 +1,7 @@
 const ARGUMENTS_SEPARATION_REGEX = /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^/\\]*(?:\\[\S\s][^/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g;
 const ARGUMENT_SEPARATION_REGEX = /([^=\s]+)=?\s*(.*)/;
 
-export default (args: string) => {
+export default (args: string): {} => {
   const parsed = {};
 
   args.match(ARGUMENTS_SEPARATION_REGEX).forEach((arg) => {
