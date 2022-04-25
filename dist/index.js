@@ -71959,17 +71959,12 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const objectArgs = parse_min_default()([
-            'command',
-            'file',
-            args,
-        ]);
-        themekit_default().command('deploy', objectArgs);
-    }
-    catch (e) {
-        // Do nothing
-    }
+    const objectArgs = parse_min_default()([
+        'command',
+        'file',
+        args,
+    ]);
+    themekit_default().command('deploy', objectArgs);
 });
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
