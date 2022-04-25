@@ -4,7 +4,7 @@ import { THEME_KIT_DEPLOY_COMMAND } from '../inputs';
 
 export default async () => {
   try {
-    await deploy([THEME_KIT_DEPLOY_COMMAND]);
+    await deploy(THEME_KIT_DEPLOY_COMMAND);
   } catch (error) {
     core.setFailed(error.message);
   }

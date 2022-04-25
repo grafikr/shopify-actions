@@ -1,5 +1,5 @@
 import themeKit from '@shopify/themekit';
-import minimist from 'minimist';
+import argsParser from 'args-parser';
 import path from 'path';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../inputs';
 import config from './config';
@@ -26,10 +26,13 @@ export const deployTheme = async (themeID: number) => {
   }
 };
 
-export const deploy = async (args: [string]) => {
+export const deploy = async (args: string) => {
   try {
-    const objectArgs = minimist(args);
-    delete (objectArgs._);
+    const objectArgs = argsParser('args-parser')([
+      'command',
+      'file',
+      args,
+    ]);
 
     themeKit.command('deploy', objectArgs);
   } catch (e) {
