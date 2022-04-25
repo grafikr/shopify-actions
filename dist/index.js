@@ -72208,7 +72208,9 @@ const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        themekit_default().command('deploy', minimist_default()(args));
+        const objectArgs = minimist_default()(args);
+        delete (objectArgs._);
+        themekit_default().command('deploy', objectArgs);
     }
     catch (e) {
         // Do nothing
