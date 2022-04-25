@@ -29,7 +29,7 @@ export const deployTheme = async (themeID: number) => {
 
 export const deploy = async (args: string) => {
   try {
-    themeKit.command('deploy', parseArgs(args));
+    await themeKit.command('deploy', parseArgs(args));
   } catch (e) {
     core.info('Theme Kit returned an error while deploying');
     core.info(e.message);
