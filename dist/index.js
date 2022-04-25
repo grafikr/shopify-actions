@@ -71985,7 +71985,7 @@ const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (e) {
         core.info('Theme Kit returned an error while deploying');
-        core.info(e.message);
+        core.info(e);
     }
 });
 
