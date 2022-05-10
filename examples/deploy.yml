@@ -19,7 +19,7 @@ jobs:
         run: yarn production # Compile your assets
 
       - name: Deploy themes
-        uses: grafikr/shopify-actions@v1
+        uses: grafikr/shopify-actions@v1.0
         with:
           ACTION: "DEPLOY"
           THEME_KIT_DEPLOY_COMMAND: "--env='*-production' --allow-live"

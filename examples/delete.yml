@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete theme
-        uses: grafikr/shopify-actions@v1
+        uses: grafikr/shopify-actions@v1.0
         with:
           ACTION: "DELETE"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -11,7 +11,7 @@ This action will deploy one or more themes using Theme Kit's `deploy` command.
 ```yaml
 ...
 - name: Deploy theme
-  uses: grafikr/shopify-actions@1
+  uses: grafikr/shopify-actions@1.0
   with:
     ACTION: "DEPLOY"
     COMMAND: "--env='*-production' --allow-live"
@@ -29,7 +29,7 @@ This command will also download any [ignored file](https://shopify.dev/themes/to
 ```yaml
 ...
 - name: Create preview
-  uses: grafikr/shopify-actions@1
+  uses: grafikr/shopify-actions@1.0
   with:
     ACTION: "PREVIEW"
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,7 +44,7 @@ This action will delete a theme which has been created for preview. This is usua
 ```yaml
 ...
 - name: Create preview
-  uses: grafikr/shopify-actions@1
+  uses: grafikr/shopify-actions@1.0
   with:
     ACTION: "DELETE"
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
