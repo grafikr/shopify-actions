@@ -63807,7 +63807,7 @@ function composeCollection(CN, ctx, token, tagToken, onError) {
         : new Scalar.Scalar(res);
     node.range = coll.range;
     node.tag = tagName;
-    if (tag === null || tag === void 0 ? void 0 : tag.format)
+    if (tag?.format)
         node.format = tag.format;
     return node;
 }
@@ -63829,7 +63829,7 @@ var resolveEnd = __nccwpck_require__(1250);
 var resolveProps = __nccwpck_require__(6985);
 
 function composeDoc(options, directives, { offset, start, value, end }, onError) {
-    const opts = Object.assign({ directives }, options);
+    const opts = Object.assign({ _directives: directives }, options);
     const doc = new Document.Document(undefined, opts);
     const ctx = {
         atRoot: true,
@@ -63839,7 +63839,7 @@ function composeDoc(options, directives, { offset, start, value, end }, onError)
     };
     const props = resolveProps.resolveProps(start, {
         indicator: 'doc-start',
-        next: value !== null && value !== void 0 ? value : end === null || end === void 0 ? void 0 : end[0],
+        next: value ?? end?.[0],
         offset,
         onError,
         startOnNewline: true
@@ -63993,12 +63993,12 @@ function composeScalar(ctx, token, tagToken, onError) {
             : ctx.schema[Node.SCALAR];
     let scalar;
     try {
-        const res = tag.resolve(value, msg => onError(tagToken !== null && tagToken !== void 0 ? tagToken : token, 'TAG_RESOLVE_FAILED', msg), ctx.options);
+        const res = tag.resolve(value, msg => onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg), ctx.options);
         scalar = Node.isScalar(res) ? res : new Scalar.Scalar(res);
     }
     catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        onError(tagToken !== null && tagToken !== void 0 ? tagToken : token, 'TAG_RESOLVE_FAILED', msg);
+        onError(tagToken ?? token, 'TAG_RESOLVE_FAILED', msg);
         scalar = new Scalar.Scalar(value);
     }
     scalar.range = range;
@@ -64014,7 +64014,6 @@ function composeScalar(ctx, token, tagToken, onError) {
     return scalar;
 }
 function findScalarTagByName(schema, value, tagName, tagToken, onError) {
-    var _a;
     if (tagName === '!')
         return schema[Node.SCALAR]; // non-specific tag
     const matchWithTest = [];
@@ -64027,7 +64026,7 @@ function findScalarTagByName(schema, value, tagName, tagToken, onError) {
         }
     }
     for (const tag of matchWithTest)
-        if ((_a = tag.test) === null || _a === void 0 ? void 0 : _a.test(value))
+        if (tag.test?.test(value))
             return tag;
     const kt = schema.knownTags[tagName];
     if (kt && !kt.collection) {
@@ -64040,10 +64039,10 @@ function findScalarTagByName(schema, value, tagName, tagToken, onError) {
     return schema[Node.SCALAR];
 }
 function findScalarTagByTest({ directives, schema }, value, token, onError) {
-    var _a;
-    const tag = schema.tags.find(tag => { var _a; return tag.default && ((_a = tag.test) === null || _a === void 0 ? void 0 : _a.test(value)); }) || schema[Node.SCALAR];
+    const tag = schema.tags.find(tag => tag.default && tag.test?.test(value)) || schema[Node.SCALAR];
     if (schema.compat) {
-        const compat = (_a = schema.compat.find(tag => { var _a; return tag.default && ((_a = tag.test) === null || _a === void 0 ? void 0 : _a.test(value)); })) !== null && _a !== void 0 ? _a : schema[Node.SCALAR];
+        const compat = schema.compat.find(tag => tag.default && tag.test?.test(value)) ??
+            schema[Node.SCALAR];
         if (tag.tag !== compat.tag) {
             const ts = directives.tagString(tag.tag);
             const cs = directives.tagString(compat.tag);
@@ -64081,7 +64080,6 @@ function getErrorPos(src) {
     return [offset, offset + (typeof source === 'string' ? source.length : 1)];
 }
 function parsePrelude(prelude) {
-    var _a;
     let comment = '';
     let atComment = false;
     let afterEmptyLine = false;
@@ -64096,7 +64094,7 @@ function parsePrelude(prelude) {
                 afterEmptyLine = false;
                 break;
             case '%':
-                if (((_a = prelude[i + 1]) === null || _a === void 0 ? void 0 : _a[0]) !== '#')
+                if (prelude[i + 1]?.[0] !== '#')
                     i += 1;
                 atComment = false;
                 break;
@@ -64273,7 +64271,7 @@ class Composer {
             this.doc = null;
         }
         else if (forceDoc) {
-            const opts = Object.assign({ directives: this.directives }, this.options);
+            const opts = Object.assign({ _directives: this.directives }, this.options);
             const doc = new Document.Document(undefined, opts);
             if (this.atDirectives)
                 this.onError(endOffset, 'MISSING_CHAR', 'Missing directives-end indicator line');
@@ -64304,7 +64302,6 @@ var utilMapIncludes = __nccwpck_require__(6899);
 
 const startColMsg = 'All mapping items must start at the same column';
 function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
-    var _a;
     const map = new YAMLMap.YAMLMap(ctx.schema);
     if (ctx.atRoot)
         ctx.atRoot = false;
@@ -64314,7 +64311,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
         // key properties
         const keyProps = resolveProps.resolveProps(start, {
             indicator: 'explicit-key-ind',
-            next: key !== null && key !== void 0 ? key : sep === null || sep === void 0 ? void 0 : sep[0],
+            next: key ?? sep?.[0],
             offset,
             onError,
             startOnNewline: true
@@ -64338,10 +64335,10 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
                 continue;
             }
             if (keyProps.hasNewlineAfterProp || utilContainsNewline.containsNewline(key)) {
-                onError(key !== null && key !== void 0 ? key : start[start.length - 1], 'MULTILINE_IMPLICIT_KEY', 'Implicit keys need to be on a single line');
+                onError(key ?? start[start.length - 1], 'MULTILINE_IMPLICIT_KEY', 'Implicit keys need to be on a single line');
             }
         }
-        else if (((_a = keyProps.found) === null || _a === void 0 ? void 0 : _a.indent) !== bm.indent) {
+        else if (keyProps.found?.indent !== bm.indent) {
             onError(offset, 'BAD_INDENT', startColMsg);
         }
         // key value
@@ -64354,7 +64351,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
         if (utilMapIncludes.mapIncludes(ctx, map.items, keyNode))
             onError(keyStart, 'DUPLICATE_KEY', 'Map keys must be unique');
         // value properties
-        const valueProps = resolveProps.resolveProps(sep !== null && sep !== void 0 ? sep : [], {
+        const valueProps = resolveProps.resolveProps(sep ?? [], {
             indicator: 'map-value-ind',
             next: value,
             offset: keyNode.range[2],
@@ -64364,7 +64361,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError) {
         offset = valueProps.end;
         if (valueProps.found) {
             if (implicitKey) {
-                if ((value === null || value === void 0 ? void 0 : value.type) === 'block-map' && !valueProps.hasNewline)
+                if (value?.type === 'block-map' && !valueProps.hasNewline)
                     onError(offset, 'BLOCK_AS_IMPLICIT_KEY', 'Nested mappings are not allowed in compact mappings');
                 if (ctx.options.strict &&
                     keyProps.start < valueProps.found.offset - 1024)
@@ -64597,7 +64594,7 @@ function splitLines(source) {
     const split = source.split(/\n( *)/);
     const first = split[0];
     const m = first.match(/^( *)/);
-    const line0 = (m === null || m === void 0 ? void 0 : m[1])
+    const line0 = m?.[1]
         ? [m[1], first.slice(m[1].length)]
         : ['', first];
     const lines = [line0];
@@ -64731,7 +64728,6 @@ var utilMapIncludes = __nccwpck_require__(6899);
 const blockMsg = 'Block collections are not allowed within flow collections';
 const isBlock = (token) => token && (token.type === 'block-map' || token.type === 'block-seq');
 function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onError) {
-    var _a;
     const isMap = fc.start.source === '{';
     const fcName = isMap ? 'flow map' : 'flow sequence';
     const coll = isMap
@@ -64748,7 +64744,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
         const props = resolveProps.resolveProps(start, {
             flow: fcName,
             indicator: 'explicit-key-ind',
-            next: key !== null && key !== void 0 ? key : sep === null || sep === void 0 ? void 0 : sep[0],
+            next: key ?? sep?.[0],
             offset,
             onError,
             startOnNewline: false
@@ -64796,7 +64792,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                 if (prevItemComment) {
                     let prev = coll.items[coll.items.length - 1];
                     if (Node.isPair(prev))
-                        prev = (_a = prev.value) !== null && _a !== void 0 ? _a : prev.key;
+                        prev = prev.value ?? prev.key;
                     if (prev.comment)
                         prev.comment += '\n' + prevItemComment;
                     else
@@ -64826,7 +64822,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
             if (isBlock(key))
                 onError(keyNode.range, 'BLOCK_IN_FLOW', blockMsg);
             // value properties
-            const valueProps = resolveProps.resolveProps(sep !== null && sep !== void 0 ? sep : [], {
+            const valueProps = resolveProps.resolveProps(sep ?? [], {
                 flow: fcName,
                 indicator: 'map-value-ind',
                 next: value,
@@ -65004,7 +65000,6 @@ function singleQuotedValue(source, onError) {
     return foldLines(source.slice(1, -1)).replace(/''/g, "'");
 }
 function foldLines(source) {
-    var _a;
     /**
      * The negative lookbehind here and in the `re` RegExp is to
      * prevent causing a polynomial search time in certain cases.
@@ -65044,7 +65039,7 @@ function foldLines(source) {
     const last = /[ \t]*(.*)/sy;
     last.lastIndex = pos;
     match = last.exec(source);
-    return res + sep + ((_a = match === null || match === void 0 ? void 0 : match[1]) !== null && _a !== void 0 ? _a : '');
+    return res + sep + (match?.[1] ?? '');
 }
 function doubleQuotedValue(source, onError) {
     let res = '';
@@ -65253,7 +65248,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
                 if (anchor || tag)
                     onError(token, 'BAD_PROP_ORDER', `Anchors and tags must be after the ${token.source} indicator`);
                 if (found)
-                    onError(token, 'UNEXPECTED_TOKEN', `Unexpected ${token.source} in ${flow !== null && flow !== void 0 ? flow : 'collection'}`);
+                    onError(token, 'UNEXPECTED_TOKEN', `Unexpected ${token.source} in ${flow ?? 'collection'}`);
                 found = token;
                 atNewline = false;
                 hasSpace = false;
@@ -65293,7 +65288,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
         anchor,
         tag,
         end,
-        start: start !== null && start !== void 0 ? start : end
+        start: start ?? end
     };
 }
 
@@ -65368,7 +65363,7 @@ function emptyScalarPosition(offset, before, pos) {
             // Technically, an empty scalar is immediately after the last non-empty
             // node, but it's more useful to place it after any whitespace.
             st = before[++i];
-            while ((st === null || st === void 0 ? void 0 : st.type) === 'space') {
+            while (st?.type === 'space') {
                 offset += st.source.length;
                 st = before[++i];
             }
@@ -65392,7 +65387,7 @@ exports.emptyScalarPosition = emptyScalarPosition;
 var utilContainsNewline = __nccwpck_require__(976);
 
 function flowIndentCheck(indent, fc, onError) {
-    if ((fc === null || fc === void 0 ? void 0 : fc.type) === 'flow-collection') {
+    if (fc?.type === 'flow-collection') {
         const end = fc.end[0];
         if (end.indent === indent &&
             (end.source === ']' || end.source === '}') &&
@@ -65484,8 +65479,8 @@ class Document {
         }, options);
         this.options = opt;
         let { version } = opt;
-        if (options === null || options === void 0 ? void 0 : options.directives) {
-            this.directives = options.directives.atDocument();
+        if (options?._directives) {
+            this.directives = options._directives.atDocument();
             if (this.directives.yaml.explicit)
                 version = this.directives.yaml.version;
         }
@@ -65567,13 +65562,13 @@ class Document {
             options = replacer;
             replacer = undefined;
         }
-        const { aliasDuplicateObjects, anchorPrefix, flow, keepUndefined, onTagObj, tag } = options !== null && options !== void 0 ? options : {};
+        const { aliasDuplicateObjects, anchorPrefix, flow, keepUndefined, onTagObj, tag } = options ?? {};
         const { onAnchor, setAnchors, sourceObjects } = anchors.createNodeAnchors(this, 
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         anchorPrefix || 'a');
         const ctx = {
-            aliasDuplicateObjects: aliasDuplicateObjects !== null && aliasDuplicateObjects !== void 0 ? aliasDuplicateObjects : true,
-            keepUndefined: keepUndefined !== null && keepUndefined !== void 0 ? keepUndefined : false,
+            aliasDuplicateObjects: aliasDuplicateObjects ?? true,
+            keepUndefined: keepUndefined ?? false,
             onAnchor,
             onTagObj,
             replacer: _replacer,
@@ -65737,7 +65732,7 @@ class Document {
             maxAliasCount: typeof maxAliasCount === 'number' ? maxAliasCount : 100,
             stringify: stringify.stringify
         };
-        const res = toJS.toJS(this.contents, jsonArg !== null && jsonArg !== void 0 ? jsonArg : '', ctx);
+        const res = toJS.toJS(this.contents, jsonArg ?? '', ctx);
         if (typeof onAnchor === 'function')
             for (const { count, res } of ctx.anchors.values())
                 onAnchor(res, count);
@@ -65938,24 +65933,22 @@ var Scalar = __nccwpck_require__(9338);
 
 const defaultTagPrefix = 'tag:yaml.org,2002:';
 function findTagObject(value, tagName, tags) {
-    var _a;
     if (tagName) {
         const match = tags.filter(t => t.tag === tagName);
-        const tagObj = (_a = match.find(t => !t.format)) !== null && _a !== void 0 ? _a : match[0];
+        const tagObj = match.find(t => !t.format) ?? match[0];
         if (!tagObj)
             throw new Error(`Tag ${tagName} not found`);
         return tagObj;
     }
-    return tags.find(t => { var _a; return ((_a = t.identify) === null || _a === void 0 ? void 0 : _a.call(t, value)) && !t.format; });
+    return tags.find(t => t.identify?.(value) && !t.format);
 }
 function createNode(value, tagName, ctx) {
-    var _a, _b;
     if (Node.isDocument(value))
         value = value.contents;
     if (Node.isNode(value))
         return value;
     if (Node.isPair(value)) {
-        const map = (_b = (_a = ctx.schema[Node.MAP]).createNode) === null || _b === void 0 ? void 0 : _b.call(_a, ctx.schema, null, ctx);
+        const map = ctx.schema[Node.MAP].createNode?.(ctx.schema, null, ctx);
         map.items.push(value);
         return map;
     }
@@ -65983,7 +65976,7 @@ function createNode(value, tagName, ctx) {
             sourceObjects.set(value, ref);
         }
     }
-    if (tagName === null || tagName === void 0 ? void 0 : tagName.startsWith('!!'))
+    if (tagName?.startsWith('!!'))
         tagName = defaultTagPrefix + tagName.slice(2);
     let tagObj = findTagObject(value, tagName, schema.tags);
     if (!tagObj) {
@@ -66008,7 +66001,7 @@ function createNode(value, tagName, ctx) {
         onTagObj(tagObj);
         delete ctx.onTagObj;
     }
-    const node = (tagObj === null || tagObj === void 0 ? void 0 : tagObj.createNode)
+    const node = tagObj?.createNode
         ? tagObj.createNode(ctx.schema, value, ctx)
         : new Scalar.Scalar(value);
     if (tagName)
@@ -66491,7 +66484,8 @@ function collectionFromPath(schema, path, value) {
         sourceObjects: new Map()
     });
 }
-// null, undefined, or an empty non-string iterable (e.g. [])
+// Type guard is intentionally a little wrong so as to be more useful,
+// as it does not cover untypable empty non-string iterables (e.g. []).
 const isEmptyPath = (path) => path == null ||
     (typeof path === 'object' && !!path[Symbol.iterator]().next().done);
 class Collection extends Node.NodeBase {
@@ -66722,11 +66716,11 @@ class Pair {
         return new Pair(key, value);
     }
     toJSON(_, ctx) {
-        const pair = (ctx === null || ctx === void 0 ? void 0 : ctx.mapAsMap) ? new Map() : {};
+        const pair = ctx?.mapAsMap ? new Map() : {};
         return addPairToJSMap.addPairToJSMap(ctx, pair, this);
     }
     toString(ctx, onComment, onChompKeep) {
-        return (ctx === null || ctx === void 0 ? void 0 : ctx.doc)
+        return ctx?.doc
             ? stringifyPair.stringifyPair(this, ctx, onComment, onChompKeep)
             : JSON.stringify(this);
     }
@@ -66754,7 +66748,7 @@ class Scalar extends Node.NodeBase {
         this.value = value;
     }
     toJSON(arg, ctx) {
-        return (ctx === null || ctx === void 0 ? void 0 : ctx.keep) ? this.value : toJS.toJS(this.value, arg, ctx);
+        return ctx?.keep ? this.value : toJS.toJS(this.value, arg, ctx);
     }
     toString() {
         return String(this.value);
@@ -66812,18 +66806,17 @@ class YAMLMap extends Collection.Collection {
      *   collection will throw. Otherwise, overwrites the previous value.
      */
     add(pair, overwrite) {
-        var _a;
         let _pair;
         if (Node.isPair(pair))
             _pair = pair;
         else if (!pair || typeof pair !== 'object' || !('key' in pair)) {
             // In TypeScript, this never happens.
-            _pair = new Pair.Pair(pair, pair.value);
+            _pair = new Pair.Pair(pair, pair?.value);
         }
         else
             _pair = new Pair.Pair(pair.key, pair.value);
         const prev = findPair(this.items, _pair.key);
-        const sortEntries = (_a = this.schema) === null || _a === void 0 ? void 0 : _a.sortMapEntries;
+        const sortEntries = this.schema?.sortMapEntries;
         if (prev) {
             if (!overwrite)
                 throw new Error(`Key ${_pair.key} already set`);
@@ -66853,8 +66846,8 @@ class YAMLMap extends Collection.Collection {
     }
     get(key, keepScalar) {
         const it = findPair(this.items, key);
-        const node = it === null || it === void 0 ? void 0 : it.value;
-        return !keepScalar && Node.isScalar(node) ? node.value : node;
+        const node = it?.value;
+        return (!keepScalar && Node.isScalar(node) ? node.value : node) ?? undefined;
     }
     has(key) {
         return !!findPair(this.items, key);
@@ -66868,8 +66861,8 @@ class YAMLMap extends Collection.Collection {
      * @returns Instance of Type, Map, or Object
      */
     toJSON(_, ctx, Type) {
-        const map = Type ? new Type() : (ctx === null || ctx === void 0 ? void 0 : ctx.mapAsMap) ? new Map() : {};
-        if (ctx === null || ctx === void 0 ? void 0 : ctx.onCreate)
+        const map = Type ? new Type() : ctx?.mapAsMap ? new Map() : {};
+        if (ctx?.onCreate)
             ctx.onCreate(map);
         for (const item of this.items)
             addPairToJSMap.addPairToJSMap(ctx, map, item);
@@ -66938,14 +66931,6 @@ class YAMLSeq extends Collection.Collection {
         const del = this.items.splice(idx, 1);
         return del.length > 0;
     }
-    /**
-     * Returns item at `key`, or `undefined` if not found. By default unwraps
-     * scalar values from their surrounding node; to disable set `keepScalar` to
-     * `true` (collections are always returned intact).
-     *
-     * `key` must contain a representation of an integer for this to succeed.
-     * It may be wrapped in a `Scalar`.
-     */
     get(key, keepScalar) {
         const idx = asItemIndex(key);
         if (typeof idx !== 'number')
@@ -66982,7 +66967,7 @@ class YAMLSeq extends Collection.Collection {
     }
     toJSON(_, ctx) {
         const seq = [];
-        if (ctx === null || ctx === void 0 ? void 0 : ctx.onCreate)
+        if (ctx?.onCreate)
             ctx.onCreate(seq);
         let i = 0;
         for (const item of this.items)
@@ -67029,7 +67014,7 @@ var toJS = __nccwpck_require__(2463);
 
 const MERGE_KEY = '<<';
 function addPairToJSMap(ctx, map, { key, value }) {
-    if ((ctx === null || ctx === void 0 ? void 0 : ctx.doc.schema.merge) && isMergeKey(key)) {
+    if (ctx?.doc.schema.merge && isMergeKey(key)) {
         value = Node.isAlias(value) ? value.resolve(ctx.doc) : value;
         if (Node.isSeq(value))
             for (const it of value.items)
@@ -67166,7 +67151,7 @@ function toJS(value, arg, ctx) {
             ctx.onCreate(res);
         return res;
     }
-    if (typeof value === 'bigint' && !(ctx === null || ctx === void 0 ? void 0 : ctx.keep))
+    if (typeof value === 'bigint' && !ctx?.keep)
         return Number(value);
     return value;
 }
@@ -67222,7 +67207,6 @@ function resolveAsScalar(token, strict = true, onError) {
  * @param context.type The preferred type of the scalar token. If undefined, the previous type of the `token` will be used, defaulting to `'PLAIN'`.
  */
 function createScalarToken(value, context) {
-    var _a;
     const { implicitKey = false, indent, inFlow = false, offset = -1, type = 'PLAIN' } = context;
     const source = stringifyString.stringifyString({ type, value }, {
         implicitKey,
@@ -67230,7 +67214,7 @@ function createScalarToken(value, context) {
         inFlow,
         options: { blockQuote: true, lineWidth: -1 }
     });
-    const end = (_a = context.end) !== null && _a !== void 0 ? _a : [
+    const end = context.end ?? [
         { type: 'newline', offset: -1, indent, source: '\n' }
     ];
     switch (source[0]) {
@@ -67529,7 +67513,7 @@ visit.REMOVE = REMOVE;
 visit.itemAtPath = (cst, path) => {
     let item = cst;
     for (const [field, index] of path) {
-        const tok = item === null || item === void 0 ? void 0 : item[field];
+        const tok = item?.[field];
         if (tok && 'items' in tok) {
             item = tok.items[index];
         }
@@ -67546,7 +67530,7 @@ visit.itemAtPath = (cst, path) => {
 visit.parentCollection = (cst, path) => {
     const parent = visit.itemAtPath(cst, path.slice(0, -1));
     const field = path[path.length - 1][0];
-    const coll = parent === null || parent === void 0 ? void 0 : parent[field];
+    const coll = parent?.[field];
     if (coll && 'items' in coll)
         return coll;
     throw new Error('Parent collection not found');
@@ -67857,13 +67841,12 @@ class Lexer {
      * @returns A generator of lexical tokens
      */
     *lex(source, incomplete = false) {
-        var _a;
         if (source) {
             this.buffer = this.buffer ? this.buffer + source : source;
             this.lineEndPos = null;
         }
         this.atEnd = !incomplete;
-        let next = (_a = this.next) !== null && _a !== void 0 ? _a : 'stream';
+        let next = this.next ?? 'stream';
         while (next && (incomplete || this.hasChars(1)))
             next = yield* this.parseNext(next);
     }
@@ -68491,7 +68474,7 @@ function findNonEmptyIndex(list) {
     return -1;
 }
 function isFlowToken(token) {
-    switch (token === null || token === void 0 ? void 0 : token.type) {
+    switch (token?.type) {
         case 'alias':
         case 'scalar':
         case 'single-quoted-scalar':
@@ -68503,13 +68486,12 @@ function isFlowToken(token) {
     }
 }
 function getPrevProps(parent) {
-    var _a;
     switch (parent.type) {
         case 'document':
             return parent.start;
         case 'block-map': {
             const it = parent.items[parent.items.length - 1];
-            return (_a = it.sep) !== null && _a !== void 0 ? _a : it.start;
+            return it.sep ?? it.start;
         }
         case 'block-seq':
             return parent.items[parent.items.length - 1].start;
@@ -68520,7 +68502,6 @@ function getPrevProps(parent) {
 }
 /** Note: May modify input array */
 function getFirstKeyStartProps(prev) {
-    var _a;
     if (prev.length === 0)
         return [];
     let i = prev.length;
@@ -68534,7 +68515,7 @@ function getFirstKeyStartProps(prev) {
                 break loop;
         }
     }
-    while (((_a = prev[++i]) === null || _a === void 0 ? void 0 : _a.type) === 'space') {
+    while (prev[++i]?.type === 'space') {
         /* loop */
     }
     return prev.splice(i, prev.length);
@@ -68738,7 +68719,7 @@ class Parser {
         return this.stack[this.stack.length - n];
     }
     *pop(error) {
-        const token = error !== null && error !== void 0 ? error : this.stack.pop();
+        const token = error ?? this.stack.pop();
         /* istanbul ignore if should not happen */
         if (!token) {
             const message = 'Tried to pop an empty stack';
@@ -68943,7 +68924,6 @@ class Parser {
         }
     }
     *blockMap(map) {
-        var _a;
         const it = map.items[map.items.length - 1];
         // it.sep is true-ish if pair already has key or : separator
         switch (this.type) {
@@ -68952,8 +68932,8 @@ class Parser {
                 if (it.value) {
                     const end = 'end' in it.value ? it.value.end : undefined;
                     const last = Array.isArray(end) ? end[end.length - 1] : undefined;
-                    if ((last === null || last === void 0 ? void 0 : last.type) === 'comment')
-                        end === null || end === void 0 ? void 0 : end.push(this.sourceToken);
+                    if (last?.type === 'comment')
+                        end?.push(this.sourceToken);
                     else
                         map.items.push({ start: [this.sourceToken] });
                 }
@@ -68975,7 +68955,7 @@ class Parser {
                 else {
                     if (this.atIndentedComment(it.start, map.indent)) {
                         const prev = map.items[map.items.length - 2];
-                        const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
+                        const end = prev?.value?.end;
                         if (Array.isArray(end)) {
                             Array.prototype.push.apply(end, it.start);
                             end.push(this.sourceToken);
@@ -69152,15 +69132,14 @@ class Parser {
         yield* this.step();
     }
     *blockSequence(seq) {
-        var _a;
         const it = seq.items[seq.items.length - 1];
         switch (this.type) {
             case 'newline':
                 if (it.value) {
                     const end = 'end' in it.value ? it.value.end : undefined;
                     const last = Array.isArray(end) ? end[end.length - 1] : undefined;
-                    if ((last === null || last === void 0 ? void 0 : last.type) === 'comment')
-                        end === null || end === void 0 ? void 0 : end.push(this.sourceToken);
+                    if (last?.type === 'comment')
+                        end?.push(this.sourceToken);
                     else
                         seq.items.push({ start: [this.sourceToken] });
                 }
@@ -69174,7 +69153,7 @@ class Parser {
                 else {
                     if (this.atIndentedComment(it.start, seq.indent)) {
                         const prev = seq.items[seq.items.length - 2];
-                        const end = (_a = prev === null || prev === void 0 ? void 0 : prev.value) === null || _a === void 0 ? void 0 : _a.end;
+                        const end = prev?.value?.end;
                         if (Array.isArray(end)) {
                             Array.prototype.push.apply(end, it.start);
                             end.push(this.sourceToken);
@@ -69457,7 +69436,7 @@ function parseOptions(options) {
  */
 function parseAllDocuments(source, options = {}) {
     const { lineCounter, prettyErrors } = parseOptions(options);
-    const parser$1 = new parser.Parser(lineCounter === null || lineCounter === void 0 ? void 0 : lineCounter.addNewLine);
+    const parser$1 = new parser.Parser(lineCounter?.addNewLine);
     const composer$1 = new composer.Composer(options);
     const docs = Array.from(composer$1.compose(parser$1.parse(source)));
     if (prettyErrors && lineCounter)
@@ -69472,7 +69451,7 @@ function parseAllDocuments(source, options = {}) {
 /** Parse an input string into a single YAML.Document */
 function parseDocument(source, options = {}) {
     const { lineCounter, prettyErrors } = parseOptions(options);
-    const parser$1 = new parser.Parser(lineCounter === null || lineCounter === void 0 ? void 0 : lineCounter.addNewLine);
+    const parser$1 = new parser.Parser(lineCounter?.addNewLine);
     const composer$1 = new composer.Composer(options);
     // `doc` is always set by compose.end(true) at the very latest
     let doc = null;
@@ -69511,7 +69490,6 @@ function parse(src, reviver, options) {
     return doc.toJS(Object.assign({ reviver: _reviver }, options));
 }
 function stringify(value, replacer, options) {
-    var _a;
     let _replacer = null;
     if (typeof replacer === 'function' || Array.isArray(replacer)) {
         _replacer = replacer;
@@ -69526,7 +69504,7 @@ function stringify(value, replacer, options) {
         options = indent < 1 ? undefined : indent > 8 ? { indent: 8 } : { indent };
     }
     if (value === undefined) {
-        const { keepUndefined } = (_a = options !== null && options !== void 0 ? options : replacer) !== null && _a !== void 0 ? _a : {};
+        const { keepUndefined } = options ?? replacer ?? {};
         if (!keepUndefined)
             return undefined;
     }
@@ -69565,7 +69543,7 @@ class Schema {
         this.name = (typeof schema === 'string' && schema) || 'core';
         this.knownTags = resolveKnownTags ? tags.coreKnownTags : {};
         this.tags = tags.getTags(customTags, this.name);
-        this.toStringOptions = toStringDefaults !== null && toStringDefaults !== void 0 ? toStringDefaults : null;
+        this.toStringOptions = toStringDefaults ?? null;
         Object.defineProperty(this, Node.MAP, { value: map.map });
         Object.defineProperty(this, Node.SCALAR, { value: string.string });
         Object.defineProperty(this, Node.SEQ, { value: seq.seq });
@@ -70351,7 +70329,7 @@ class YAMLOMap extends YAMLSeq.YAMLSeq {
         if (!ctx)
             return super.toJSON(_);
         const map = new Map();
-        if (ctx === null || ctx === void 0 ? void 0 : ctx.onCreate)
+        if (ctx?.onCreate)
             ctx.onCreate(map);
         for (const pair of this.items) {
             let key, value;
@@ -70417,7 +70395,6 @@ var Scalar = __nccwpck_require__(9338);
 var YAMLSeq = __nccwpck_require__(5161);
 
 function resolvePairs(seq, onError) {
-    var _a;
     if (Node.isSeq(seq)) {
         for (let i = 0; i < seq.items.length; ++i) {
             let item = seq.items[i];
@@ -70432,7 +70409,7 @@ function resolvePairs(seq, onError) {
                         ? `${item.commentBefore}\n${pair.key.commentBefore}`
                         : item.commentBefore;
                 if (item.comment) {
-                    const cn = (_a = pair.value) !== null && _a !== void 0 ? _a : pair.key;
+                    const cn = pair.value ?? pair.key;
                     cn.comment = cn.comment
                         ? `${item.comment}\n${cn.comment}`
                         : item.comment;
@@ -70572,6 +70549,10 @@ class YAMLSet extends YAMLMap.YAMLMap {
         if (!prev)
             this.items.push(pair);
     }
+    /**
+     * If `keepPair` is `true`, returns the Pair matching `key`.
+     * Otherwise, returns the value of that Pair's key.
+     */
     get(key, keepPair) {
         const pair = YAMLMap.findPair(this.items, key);
         return !keepPair && Node.isPair(pair)
@@ -70952,26 +70933,25 @@ function createStringifyContext(doc, options) {
     };
 }
 function getTagObject(tags, item) {
-    var _a, _b, _c, _d;
     if (item.tag) {
         const match = tags.filter(t => t.tag === item.tag);
         if (match.length > 0)
-            return (_a = match.find(t => t.format === item.format)) !== null && _a !== void 0 ? _a : match[0];
+            return match.find(t => t.format === item.format) ?? match[0];
     }
     let tagObj = undefined;
     let obj;
     if (Node.isScalar(item)) {
         obj = item.value;
-        const match = tags.filter(t => { var _a; return (_a = t.identify) === null || _a === void 0 ? void 0 : _a.call(t, obj); });
+        const match = tags.filter(t => t.identify?.(obj));
         tagObj =
-            (_b = match.find(t => t.format === item.format)) !== null && _b !== void 0 ? _b : match.find(t => !t.format);
+            match.find(t => t.format === item.format) ?? match.find(t => !t.format);
     }
     else {
         obj = item;
         tagObj = tags.find(t => t.nodeClass && obj instanceof t.nodeClass);
     }
     if (!tagObj) {
-        const name = (_d = (_c = obj === null || obj === void 0 ? void 0 : obj.constructor) === null || _c === void 0 ? void 0 : _c.name) !== null && _d !== void 0 ? _d : typeof obj;
+        const name = obj?.constructor?.name ?? typeof obj;
         throw new Error(`Tag not resolved for ${name} value`);
     }
     return tagObj;
@@ -70992,13 +70972,12 @@ function stringifyProps(node, tagObj, { anchors: anchors$1, doc }) {
     return props.join(' ');
 }
 function stringify(item, ctx, onComment, onChompKeep) {
-    var _a, _b;
     if (Node.isPair(item))
         return item.toString(ctx, onComment, onChompKeep);
     if (Node.isAlias(item)) {
         if (ctx.doc.directives)
             return item.toString(ctx);
-        if ((_a = ctx.resolvedAliases) === null || _a === void 0 ? void 0 : _a.has(item)) {
+        if (ctx.resolvedAliases?.has(item)) {
             throw new TypeError(`Cannot stringify circular structure without alias nodes`);
         }
         else {
@@ -71017,7 +70996,7 @@ function stringify(item, ctx, onComment, onChompKeep) {
         tagObj = getTagObject(ctx.doc.schema.tags, node);
     const props = stringifyProps(node, tagObj, ctx);
     if (props.length > 0)
-        ctx.indentAtStart = ((_b = ctx.indentAtStart) !== null && _b !== void 0 ? _b : 0) + props.length + 1;
+        ctx.indentAtStart = (ctx.indentAtStart ?? 0) + props.length + 1;
     const str = typeof tagObj.stringify === 'function'
         ? tagObj.stringify(node, ctx, onComment, onChompKeep)
         : Node.isScalar(node)
@@ -71048,8 +71027,7 @@ var stringify = __nccwpck_require__(8409);
 var stringifyComment = __nccwpck_require__(5182);
 
 function stringifyCollection(collection, ctx, options) {
-    var _a;
-    const flow = (_a = ctx.inFlow) !== null && _a !== void 0 ? _a : collection.flow;
+    const flow = ctx.inFlow ?? collection.flow;
     const stringify = flow ? stringifyFlowCollection : stringifyBlockCollection;
     return stringify(collection, ctx, options);
 }
@@ -71241,7 +71219,6 @@ var stringify = __nccwpck_require__(8409);
 var stringifyComment = __nccwpck_require__(5182);
 
 function stringifyDocument(doc, options) {
-    var _a;
     const lines = [];
     let hasDirectives = options.directives === true;
     if (options.directives !== false && doc.directives) {
@@ -71293,7 +71270,7 @@ function stringifyDocument(doc, options) {
     else {
         lines.push(stringify.stringify(doc.contents, ctx));
     }
-    if ((_a = doc.directives) === null || _a === void 0 ? void 0 : _a.docEnd) {
+    if (doc.directives?.docEnd) {
         if (doc.comment) {
             const cs = commentString(doc.comment);
             if (cs.includes('\n')) {
@@ -71766,9 +71743,9 @@ function plainString(item, ctx, onComment, onChompKeep) {
     // booleans get parsed with those types in v1.2 (e.g. '42', 'true' & '0.9e-3'),
     // and others in v1.1.
     if (actualString) {
-        const test = (tag) => { var _a; return tag.default && tag.tag !== 'tag:yaml.org,2002:str' && ((_a = tag.test) === null || _a === void 0 ? void 0 : _a.test(str)); };
+        const test = (tag) => tag.default && tag.tag !== 'tag:yaml.org,2002:str' && tag.test?.test(str);
         const { compat, tags } = ctx.doc.schema;
-        if (tags.some(test) || (compat === null || compat === void 0 ? void 0 : compat.some(test)))
+        if (tags.some(test) || compat?.some(test))
             return quotedString(value, ctx);
     }
     return implicitKey
@@ -72023,19 +72000,18 @@ function initVisitor(visitor) {
     return visitor;
 }
 function callVisitor(key, node, visitor, path) {
-    var _a, _b, _c, _d, _e;
     if (typeof visitor === 'function')
         return visitor(key, node, path);
     if (Node.isMap(node))
-        return (_a = visitor.Map) === null || _a === void 0 ? void 0 : _a.call(visitor, key, node, path);
+        return visitor.Map?.(key, node, path);
     if (Node.isSeq(node))
-        return (_b = visitor.Seq) === null || _b === void 0 ? void 0 : _b.call(visitor, key, node, path);
+        return visitor.Seq?.(key, node, path);
     if (Node.isPair(node))
-        return (_c = visitor.Pair) === null || _c === void 0 ? void 0 : _c.call(visitor, key, node, path);
+        return visitor.Pair?.(key, node, path);
     if (Node.isScalar(node))
-        return (_d = visitor.Scalar) === null || _d === void 0 ? void 0 : _d.call(visitor, key, node, path);
+        return visitor.Scalar?.(key, node, path);
     if (Node.isAlias(node))
-        return (_e = visitor.Alias) === null || _e === void 0 ? void 0 : _e.call(visitor, key, node, path);
+        return visitor.Alias?.(key, node, path);
     return undefined;
 }
 function replaceNode(key, path, node) {
