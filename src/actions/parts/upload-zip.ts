@@ -25,11 +25,11 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
   const response = await createTheme({
     src: (await ngrok.connect(8080)).replace('https://', 'http://'),
     ...data,
+  }).finally(async () => {
+    // Close tunnel
+    server.close();
+    await ngrok.kill();
   });
-
-  // Close tunnel
-  server.close();
-  await ngrok.kill();
 
   return response.theme.id;
 };
