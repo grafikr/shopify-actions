@@ -1,4 +1,3 @@
-import minimatch from 'minimatch';
 import axios from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
@@ -59,7 +58,7 @@ export const getIgnoredAssets = async (id: number, patterns: string[]) => {
     for (let i = 0; i < patterns.length; i += 1) {
       const pattern = transformPattern(patterns[i]);
 
-      if (minimatch(asset.key, pattern)) return true;
+      if (asset.key.match(new RegExp(pattern, 'g'))) return true;
     }
 
     return false;
