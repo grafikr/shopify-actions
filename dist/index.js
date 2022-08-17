@@ -29488,11 +29488,11 @@ function asPromise(normalizedOptions) {
                     request._beforeError(new types_1.RequestError(error.message, error, request));
                     return;
                 }
+                globalResponse = response;
                 if (!is_response_ok_1.isResponseOk(response)) {
                     request._beforeError(new types_1.HTTPError(response));
                     return;
                 }
-                globalResponse = response;
                 resolve(request.options.resolveBodyOnly ? response.body : response);
             });
             const onError = (error) => {
@@ -30630,6 +30630,14 @@ class Request extends stream_1.Duplex {
                 const redirectUrl = new url_1.URL(redirectBuffer, url);
                 const redirectString = redirectUrl.toString();
                 decodeURI(redirectString);
+                // eslint-disable-next-line no-inner-declarations
+                function isUnixSocketURL(url) {
+                    return url.protocol === 'unix:' || url.hostname === 'unix';
+                }
+                if (!isUnixSocketURL(url) && isUnixSocketURL(redirectUrl)) {
+                    this._beforeError(new RequestError('Cannot redirect to UNIX socket', {}, this));
+                    return;
+                }
                 // Redirecting to a different site, clear sensitive data.
                 if (redirectUrl.hostname !== url.hostname || redirectUrl.port !== url.port) {
                     if ('host' in options.headers) {
@@ -45505,7 +45513,6 @@ async function kill() {
   if (!ngrokClient) return;
   await killProcess();
   ngrokClient = null;
-  tunnels = {};
 }
 
 function getUrl() {
