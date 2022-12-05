@@ -72948,6 +72948,28 @@ const client = axios_default().create({
         'X-Shopify-Shop': shopify_environment.store,
     } : {}),
 });
+client.interceptors.response.use(undefined, (error) => {
+    const { config, response } = error;
+    if (!config) {
+        return Promise.reject(error);
+    }
+    let delay;
+    if (response.status === 429) {
+        delay = parseInt(response.headers['Retry-After'], 10) * 1000;
+    }
+    else if (response.status >= 500) {
+        delay = 5000;
+    }
+    else {
+        return Promise.reject(error);
+    }
+    const timeout = new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, delay);
+    });
+    return timeout.then(() => axios_default()(config));
+});
 const getTheme = (id) => shopify_awaiter(void 0, void 0, void 0, function* () {
     return client.get(`themes/${id}.json`)
         .then((response) => response.data)
