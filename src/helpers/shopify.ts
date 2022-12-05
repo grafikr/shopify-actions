@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
 import {
   Asset, Theme, CreateTheme, UpdateTheme,
 } from '../types/shopify';
-import config from './config';
+import themekitConfig from './config';
 import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
-const environment = config[THEME_KIT_ENVIRONMENT];
+const environment = themekitConfig[THEME_KIT_ENVIRONMENT];
 
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
 const isThemeKitEnvironment = isThemeKitToken(environment.password);
@@ -24,6 +24,32 @@ const client = axios.create({
       'X-Shopify-Shop': environment.store,
     } : {},
   },
+});
+
+client.interceptors.response.use(undefined, (error: AxiosError) => {
+  const { config, response } = error;
+
+  if (!config) {
+    return Promise.reject(error);
+  }
+
+  let delay: number;
+
+  if (response.status === 429) {
+    delay = parseInt(response.headers['Retry-After'], 10) * 1000;
+  } else if (response.status >= 500) {
+    delay = 5000;
+  } else {
+    return Promise.reject(error);
+  }
+
+  const timeout = new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, delay);
+  });
+
+  return timeout.then(() => axios(config));
 });
 
 export const getTheme = async (id: number): Promise<Theme | null> => client.get(`themes/${id}.json`)
