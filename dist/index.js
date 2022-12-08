@@ -72937,6 +72937,7 @@ var shopify_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
+
 const shopify_environment = helpers_config[THEME_KIT_ENVIRONMENT];
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
 const isThemeKitEnvironment = isThemeKitToken(shopify_environment.password);
@@ -72954,13 +72955,19 @@ client.interceptors.response.use(undefined, (error) => {
         return Promise.reject(error);
     }
     let delay;
-    if (response.status === 429) {
-        delay = parseInt(response.headers['Retry-After'], 10) * 1000;
+    if ((response === null || response === void 0 ? void 0 : response.status) === 429) {
+        delay = parseInt(response === null || response === void 0 ? void 0 : response.headers['Retry-After'], 10) * 1000;
     }
-    else if (response.status >= 500) {
+    else if ((response === null || response === void 0 ? void 0 : response.status) >= 500) {
         delay = 5000;
     }
     else {
+        if (response) {
+            core.info(`Request to ${config.url} failed with status code ${response.status}`);
+            if (typeof response.data === 'string') {
+                core.info(response.data);
+            }
+        }
         return Promise.reject(error);
     }
     const timeout = new Promise((resolve) => {
