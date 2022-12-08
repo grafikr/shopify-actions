@@ -73265,7 +73265,7 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         else {
             const zipFilePath = yield create_zip_from_build();
             themeID = yield upload_zip(zipFilePath, {
-                name: themeName,
+                name: themeName.substring(0, 50),
                 role: SHOPIFY_THEME_ROLE,
             });
             cleanup([zipFilePath]);
