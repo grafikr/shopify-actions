@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import axios, { AxiosError } from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
@@ -35,11 +36,19 @@ client.interceptors.response.use(undefined, (error: AxiosError) => {
 
   let delay: number;
 
-  if (response.status === 429) {
-    delay = parseInt(response.headers['Retry-After'], 10) * 1000;
-  } else if (response.status >= 500) {
+  if (response?.status === 429) {
+    delay = parseInt(response?.headers['Retry-After'], 10) * 1000;
+  } else if (response?.status >= 500) {
     delay = 5000;
   } else {
+    if (response) {
+      core.info(`Request to ${config.url} failed with status code ${response.status}`);
+
+      if (typeof response.data === 'string') {
+        core.info(response.data);
+      }
+    }
+
     return Promise.reject(error);
   }
 
