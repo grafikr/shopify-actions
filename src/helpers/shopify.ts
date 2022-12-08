@@ -35,7 +35,7 @@ client.interceptors.response.use(undefined, (error: AxiosError) => {
 
   let delay: number;
 
-  if (response.status === 429) {
+  if (response.status === 422) {
     delay = parseInt(response.headers['Retry-After'], 10) * 1000;
   } else if (response.status >= 500) {
     delay = 5000;
