@@ -72955,21 +72955,25 @@ client.interceptors.response.use(undefined, (error) => {
         return Promise.reject(error);
     }
     let delay;
-    if ((response === null || response === void 0 ? void 0 : response.status) === 429) {
-        delay = parseInt(response === null || response === void 0 ? void 0 : response.headers['Retry-After'], 10) * 1000;
-    }
-    else if ((response === null || response === void 0 ? void 0 : response.status) >= 500) {
-        delay = 5000;
-    }
-    else {
-        if (response) {
+    if (response) {
+        if (response.status === 429) {
+            delay = parseInt(response.headers['Retry-After'], 10) * 1000;
+        }
+        else if (response.status >= 500) {
+            delay = 5000;
+        }
+        else {
             core.info(`Request to ${config.url} failed with status code ${response.status}`);
             if (typeof response.data === 'string') {
                 core.info(response.data);
             }
+            return Promise.reject(error);
         }
+    }
+    else {
         return Promise.reject(error);
     }
+    core.info('Retrying request...');
     const timeout = new Promise((resolve) => {
         setTimeout(() => {
             resolve();
