@@ -72963,9 +72963,12 @@ client.interceptors.response.use(undefined, (error) => {
             delay = 5000;
         }
         else {
-            core.info(`Request to ${config.url} failed with status code ${response.status}`);
+            core.error(`Request to ${config.url} failed with status code ${response.status}`);
             if (typeof response.data === 'string') {
-                core.info(response.data);
+                core.error(response.data);
+            }
+            else if (typeof response.data === 'object') {
+                core.error(JSON.stringify(response.data));
             }
             return Promise.reject(error);
         }
