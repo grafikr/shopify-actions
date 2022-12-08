@@ -72954,7 +72954,7 @@ client.interceptors.response.use(undefined, (error) => {
         return Promise.reject(error);
     }
     let delay;
-    if (response.status === 429) {
+    if (response.status === 422) {
         delay = parseInt(response.headers['Retry-After'], 10) * 1000;
     }
     else if (response.status >= 500) {
