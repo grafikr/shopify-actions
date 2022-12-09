@@ -72937,6 +72937,7 @@ var shopify_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
 
 
 
+
 const shopify_environment = helpers_config[THEME_KIT_ENVIRONMENT];
 // https://github.com/Shopify/themekit/blob/master/src/httpify/client.go#L107
 const isThemeKitEnvironment = isThemeKitToken(shopify_environment.password);
@@ -72954,15 +72955,28 @@ client.interceptors.response.use(undefined, (error) => {
         return Promise.reject(error);
     }
     let delay;
-    if (response.status === 429) {
-        delay = parseInt(response.headers['Retry-After'], 10) * 1000;
-    }
-    else if (response.status >= 500) {
-        delay = 5000;
+    if (response) {
+        if (response.status === 429) {
+            delay = parseInt(response.headers['Retry-After'], 10) * 1000;
+        }
+        else if (response.status >= 500) {
+            delay = 5000;
+        }
+        else {
+            core.error(`Request to ${config.url} failed with status code ${response.status}`);
+            if (typeof response.data === 'string') {
+                core.error(response.data);
+            }
+            else if (typeof response.data === 'object') {
+                core.error(JSON.stringify(response.data));
+            }
+            return Promise.reject(error);
+        }
     }
     else {
         return Promise.reject(error);
     }
+    core.info('Retrying request...');
     const timeout = new Promise((resolve) => {
         setTimeout(() => {
             resolve();
@@ -73251,7 +73265,7 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         else {
             const zipFilePath = yield create_zip_from_build();
             themeID = yield upload_zip(zipFilePath, {
-                name: themeName,
+                name: themeName.substring(0, 50),
                 role: SHOPIFY_THEME_ROLE,
             });
             cleanup([zipFilePath]);

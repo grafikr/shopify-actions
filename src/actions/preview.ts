@@ -42,7 +42,7 @@ export default async () => {
     } else {
       const zipFilePath = await createZipFromBuild();
       themeID = await uploadZip(zipFilePath, {
-        name: themeName,
+        name: themeName.substring(0, 50),
         role: SHOPIFY_THEME_ROLE,
       });
       cleanup([zipFilePath]);
