@@ -26766,7 +26766,8 @@ function rename (src, dest, overwrite) {
 function moveAcrossDevice (src, dest, overwrite) {
   const opts = {
     overwrite,
-    errorOnExist: true
+    errorOnExist: true,
+    preserveTimestamps: true
   }
   copySync(src, dest, opts)
   return removeSync(src)
@@ -26847,7 +26848,8 @@ function rename (src, dest, overwrite, cb) {
 function moveAcrossDevice (src, dest, overwrite, cb) {
   const opts = {
     overwrite,
-    errorOnExist: true
+    errorOnExist: true,
+    preserveTimestamps: true
   }
   copy(src, dest, opts, err => {
     if (err) return cb(err)
