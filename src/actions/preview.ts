@@ -37,7 +37,7 @@ export default async () => {
       previewURL = getPreviewURL(themeID);
       customizeURL = getCustomizeURL(themeID);
 
-      await renameTheme(themeID, themeName);
+      await renameTheme(themeID, themeName.substring(0, 50));
       await deployToExistingTheme(themeID);
     } else {
       const zipFilePath = await createZipFromBuild();
