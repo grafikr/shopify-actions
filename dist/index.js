@@ -72917,6 +72917,9 @@ const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
         core.info(e);
     }
 });
+const download = (args) => __awaiter(void 0, void 0, void 0, function* () {
+    yield themekit_default().command('download', parse_args(args));
+});
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
 var deploy_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -72943,19 +72946,6 @@ var deploy_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _a
 // EXTERNAL MODULE: ./node_modules/axios/index.js
 var axios = __nccwpck_require__(6545);
 var axios_default = /*#__PURE__*/__nccwpck_require__.n(axios);
-;// CONCATENATED MODULE: ./src/helpers/transformPattern.ts
-/* harmony default export */ const transformPattern = ((input) => {
-    let pattern = input.trim();
-    pattern = pattern.replace(/\*/g, '(.*?)');
-    if (pattern.startsWith('/') && pattern.endsWith('/')) {
-        pattern = pattern.slice(1, -1);
-    }
-    else {
-        pattern = pattern.split('/').join('\\/');
-    }
-    return pattern;
-});
-
 ;// CONCATENATED MODULE: ./src/helpers/shopify.ts
 var shopify_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -72966,7 +72956,6 @@ var shopify_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-
 
 
 
@@ -73033,32 +73022,6 @@ const createTheme = (data) => shopify_awaiter(void 0, void 0, void 0, function* 
     }).then((response) => response.data);
 });
 const deleteTheme = (id) => shopify_awaiter(void 0, void 0, void 0, function* () { return client.delete(`themes/${id}.json`); });
-const getThemeAssets = (id) => shopify_awaiter(void 0, void 0, void 0, function* () {
-    const response = yield client.get(`themes/${id}/assets.json`);
-    return response.data.assets;
-});
-const getAsset = (theme_id, key) => shopify_awaiter(void 0, void 0, void 0, function* () {
-    const response = yield client.get(`themes/${theme_id}/assets.json`, {
-        params: { 'asset[key]': key },
-    });
-    return response.data.asset;
-});
-const getIgnoredAssets = (id, patterns) => shopify_awaiter(void 0, void 0, void 0, function* () {
-    const assets = (yield getThemeAssets(id)).filter((asset) => {
-        for (let i = 0; i < patterns.length; i += 1) {
-            const pattern = transformPattern(patterns[i]);
-            if (asset.key.match(new RegExp(pattern, 'g')))
-                return true;
-        }
-        return false;
-    });
-    const promises = [];
-    assets.forEach((asset) => {
-        const promise = getAsset(id, asset.key);
-        promises.push(promise);
-    });
-    return Promise.all(promises);
-});
 const getPreviewURL = (id) => `https://${shopify_environment.store}?preview_theme_id=${id}`;
 const getCustomizeURL = (id) => `https://${shopify_environment.store}/admin/themes/${id}/editor`;
 
@@ -73082,8 +73045,6 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
 
 /* harmony default export */ const build_from_environment = (() => build_from_environment_awaiter(void 0, void 0, void 0, function* () {
     const environment = helpers_config[THEME_KIT_ENVIRONMENT];
-    const themeId = parseInt(environment.theme_id, 10);
-    const ignoredFiles = environment.ignore_files;
     // Copy existing source directory
     core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
@@ -73092,11 +73053,9 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     });
     // Copy ignored files from environment
     if (environment.ignore_files) {
-        const assets = yield getIgnoredAssets(themeId, ignoredFiles);
-        assets.forEach((asset) => {
-            core.info(`Copying asset with key "${asset.key}" to "${BUILD_DIR}"`);
-            lib_default().outputFileSync(`${BUILD_DIR}/${asset.key}`, asset.value);
-        });
+        let args = environment.ignore_files.map((arg) => `"${arg}"`).join(' ');
+        args += ' --no-ignore';
+        yield download(args);
     }
 }));
 
