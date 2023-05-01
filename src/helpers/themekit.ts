@@ -35,3 +35,7 @@ export const deploy = async (args: string) => {
     core.info(e);
   }
 };
+
+export const download = async (args: string) => {
+  await themeKit.command('download', parseArgs(args));
+};

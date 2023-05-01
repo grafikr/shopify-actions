@@ -19,12 +19,9 @@ export default async (): Promise<void> => {
 
   // Copy ignored files from environment
   if (environment.ignore_files) {
-    const assets = await getIgnoredAssets(themeId, ignoredFiles);
+    let args = environment.ignore_files.map((arg) => `"${arg}"`).join(' ');
+    args += ' --no-ignore';
 
-    assets.forEach((asset) => {
-      core.info(`Copying asset with key "${asset.key}" to "${BUILD_DIR}"`);
-
-      fs.outputFileSync(`${BUILD_DIR}/${asset.key}`, asset.value);
-    });
+    await download(args);
   }
 };
