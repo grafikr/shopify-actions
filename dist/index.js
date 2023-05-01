@@ -73293,7 +73293,7 @@ var preview_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _
         if (themeID) {
             previewURL = getPreviewURL(themeID);
             customizeURL = getCustomizeURL(themeID);
-            yield rename_theme(themeID, themeName);
+            yield rename_theme(themeID, themeName.substring(0, 50));
             yield deploy_to_existing_theme(themeID);
         }
         else {
