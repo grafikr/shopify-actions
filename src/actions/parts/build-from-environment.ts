@@ -18,7 +18,7 @@ export default async (): Promise<void> => {
   // Copy ignored files from environment
   if (environment.ignore_files) {
     let args = environment.ignore_files.map((arg) => `"${arg}"`).join(' ');
-    args += ' --no-ignore';
+    args += ` --no-ignore --dir="${BUILD_DIR}"`;
 
     await download(args);
   }
