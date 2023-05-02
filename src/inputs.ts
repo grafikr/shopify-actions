@@ -21,11 +21,9 @@ export const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
   trimWhitespace: true,
 }) as ThemeRole || 'development';
 
-/*
 export const GITHUB_TOKEN: string = core.getInput('GITHUB_TOKEN', {
   required: true,
 });
-*/
 
 export const BUILD_DIR: string = core.getInput('GITHUB_TOKEN', {
   required: false,
