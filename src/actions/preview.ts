@@ -18,7 +18,8 @@ export default async () => {
     let customizeURL: string;
 
     await buildFromEnvironment();
-    const comment = await getExistingComment();
+
+    /*const comment = await getExistingComment();
 
     if (comment) {
       themeID = parseThemeID(comment);
@@ -57,7 +58,7 @@ export default async () => {
 
     core.setOutput('SHOPIFY_THEME_ID', themeID);
     core.setOutput('SHOPIFY_THEME_PREVIEW_URL', previewURL);
-    core.setOutput('SHOPIFY_THEME_CUSTOMIZE_URL', customizeURL);
+    core.setOutput('SHOPIFY_THEME_CUSTOMIZE_URL', customizeURL);*/
   } catch (error) {
     core.setFailed(error.message);
   }
