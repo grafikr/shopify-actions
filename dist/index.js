@@ -73133,8 +73133,9 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
         const stream = lib_default().createReadStream(path);
         stream.pipe(response);
     }).listen(8080);
+    const src = (yield ngrok_default().connect(8080)).replace('https://', 'http://');
     // Send create theme request
-    const response = yield createTheme(Object.assign({ src: (yield ngrok_default().connect(8080)).replace('https://', 'http://') }, data)).finally(() => upload_zip_awaiter(void 0, void 0, void 0, function* () {
+    const response = yield createTheme(Object.assign({ src }, data)).finally(() => upload_zip_awaiter(void 0, void 0, void 0, function* () {
         // Close tunnel
         server.close();
         yield ngrok_default().kill();

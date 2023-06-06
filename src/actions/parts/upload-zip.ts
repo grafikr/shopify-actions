@@ -21,9 +21,11 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
     stream.pipe(response);
   }).listen(8080);
 
+  const src = (await ngrok.connect(8080)).replace('https://', 'http://');
+
   // Send create theme request
   const response = await createTheme({
-    src: (await ngrok.connect(8080)).replace('https://', 'http://'),
+    src,
     ...data,
   }).finally(async () => {
     // Close tunnel
