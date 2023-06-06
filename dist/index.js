@@ -73124,6 +73124,7 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
 /* harmony default export */ const upload_zip = ((path, data) => upload_zip_awaiter(void 0, void 0, void 0, function* () {
     core.info('Creating theme from ZIP file');
     // Start tunnel
+    core.info('Creating server');
     const server = external_http_default().createServer((request, response) => {
         const stat = lib_default().statSync(path);
         response.writeHead(200, {
@@ -73133,8 +73134,11 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
         const stream = lib_default().createReadStream(path);
         stream.pipe(response);
     }).listen(8080);
+    // Create tunnel
+    core.info('Creating tunnel');
     const src = (yield ngrok_default().connect(8080)).replace('https://', 'http://');
     // Send create theme request
+    core.info('Creating theme');
     const response = yield createTheme(Object.assign({ src }, data)).finally(() => upload_zip_awaiter(void 0, void 0, void 0, function* () {
         // Close tunnel
         server.close();

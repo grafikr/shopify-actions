@@ -9,6 +9,7 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
   core.info('Creating theme from ZIP file');
 
   // Start tunnel
+  core.info('Creating server');
   const server = http.createServer((request, response) => {
     const stat = fs.statSync(path);
 
@@ -21,9 +22,12 @@ export default async (path: string, data: { name: string, role: ThemeRole }): Pr
     stream.pipe(response);
   }).listen(8080);
 
+  // Create tunnel
+  core.info('Creating tunnel');
   const src = (await ngrok.connect(8080)).replace('https://', 'http://');
 
   // Send create theme request
+  core.info('Creating theme');
   const response = await createTheme({
     src,
     ...data,
