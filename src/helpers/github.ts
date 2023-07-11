@@ -6,13 +6,19 @@ import { GITHUB_TOKEN } from '../inputs';
 const octokit = github.getOctokit(GITHUB_TOKEN);
 const { context } = github;
 
-export const getExistingComment = async (): Promise<RestEndpointMethodTypes['issues']['listComments']['response']['data'][0]> => {
+export const getExistingComment = async (): Promise<
+  RestEndpointMethodTypes['issues']['listComments']['response']['data'][0]
+> => {
   const comments = await octokit.rest.issues.listComments({
     ...github.context.repo,
     issue_number: context.payload.pull_request.number,
   });
 
-  return comments.data.find((comment) => comment.user.login === 'github-actions[bot]' && comment.body?.startsWith('#### Theme preview'));
+  return comments.data.find(
+    (comment) =>
+      comment.user.login === 'github-actions[bot]' &&
+      comment.body?.startsWith('#### Theme preview'),
+  );
 };
 
 export const parseThemeID = (comment): number | null => {
@@ -25,12 +31,16 @@ export const parseThemeID = (comment): number | null => {
   return null;
 };
 
-export const getIssue = async () => octokit.rest.issues.get({
-  ...context.repo,
-  issue_number: context.payload.pull_request.number,
-});
+export const getIssue = async () =>
+  octokit.rest.issues.get({
+    ...context.repo,
+    issue_number: context.payload.pull_request.number,
+  });
 
-export const createPreviewComment = async (previewURL: string, customizeURL: string) => {
+export const createPreviewComment = async (
+  previewURL: string,
+  customizeURL: string,
+) => {
   const body = `#### Theme preview
 A theme was automatically created for this issue.
 
@@ -44,7 +54,8 @@ Customize URL: [${customizeURL}](${customizeURL})`;
   });
 };
 
-export const deleteComment = async (commentID: number) => octokit.rest.issues.deleteComment({
-  ...context.repo,
-  comment_id: commentID,
-});
+export const deleteComment = async (commentID: number) =>
+  octokit.rest.issues.deleteComment({
+    ...context.repo,
+    comment_id: commentID,
+  });

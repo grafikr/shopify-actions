@@ -4,7 +4,11 @@ import { getCustomizeURL, getPreviewURL, getTheme } from '../helpers/shopify';
 import buildFromEnvironment from './parts/build-from-environment';
 import uploadZip from './parts/upload-zip';
 import {
-  getIssue, createPreviewComment, deleteComment, getExistingComment, parseThemeID,
+  getIssue,
+  createPreviewComment,
+  deleteComment,
+  getExistingComment,
+  parseThemeID,
 } from '../helpers/github';
 import cleanup from './parts/cleanup';
 import deployToExistingTheme from './parts/deploy-to-existing-theme';
@@ -23,7 +27,7 @@ export default async () => {
     if (comment) {
       themeID = parseThemeID(comment);
 
-      if (await getTheme(themeID) === null) {
+      if ((await getTheme(themeID)) === null) {
         themeID = undefined;
 
         await deleteComment(comment.id);
