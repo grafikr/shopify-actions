@@ -1,10 +1,10 @@
-name: "Shopify Theme Kit Actions"
-description: "A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores."
-author: "Grafikr"
+name: 'Shopify Theme Kit Actions'
+description: 'A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores.'
+author: 'Grafikr'
 
 branding:
-  icon: "shopping-cart"
-  color: "green"
+  icon: 'shopping-cart'
+  color: 'green'
 
 inputs:
   ACTION:
@@ -16,7 +16,7 @@ inputs:
     required: false
 
   THEME_KIT_DEPLOY_COMMAND:
-    description: "The Theme Kit command you want to use to deploy themes"
+    description: 'The Theme Kit command you want to use to deploy themes'
     required: false
 
   SHOPIFY_THEME_ROLE:
@@ -24,7 +24,7 @@ inputs:
     required: false
 
   GITHUB_TOKEN:
-    description: "Github authentication token"
+    description: 'Github authentication token'
     required: true
 
   BUILD_DIR:
@@ -33,14 +33,14 @@ inputs:
 
 outputs:
   SHOPIFY_THEME_ID:
-    description: "The created themes ID"
+    description: 'The created themes ID'
 
   SHOPIFY_THEME_PREVIEW_URL:
-    description: "The created themes preview URL"
+    description: 'The created themes preview URL'
 
   SHOPIFY_THEME_CUSTOMIZE_URL:
-    description: "The created themes customize URL"
+    description: 'The created themes customize URL'
 
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: 'node16'
+  main: 'dist/index.js'

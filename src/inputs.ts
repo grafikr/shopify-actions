@@ -6,20 +6,45 @@ export const ACTION = core.getInput('ACTION', {
   trimWhitespace: true,
 }) as 'PREVIEW' | 'DEPLOY' | 'DELETE';
 
-export const THEME_KIT_ENVIRONMENT: string = core.getInput('THEME_KIT_ENVIRONMENT', {
-  required: false,
-  trimWhitespace: true,
-}) || 'development';
-
-export const THEME_KIT_DEPLOY_COMMAND: string = core.getInput('THEME_KIT_DEPLOY_COMMAND', {
+export const AWS_S3_REGION = core.getInput('AWS_S3_REGION', {
   required: false,
   trimWhitespace: true,
 });
 
-export const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
+export const AWS_S3_BUCKET = core.getInput('AWS_S3_REGION', {
   required: false,
   trimWhitespace: true,
-}) as ThemeRole || 'development';
+});
+
+export const AWS_S3_ACCESS_KEY_ID = core.getInput('AWS_S3_REGION', {
+  required: false,
+  trimWhitespace: true,
+});
+
+export const AWS_S3_SECRET_ACCESS_KEY = core.getInput('AWS_S3_REGION', {
+  required: false,
+  trimWhitespace: true,
+});
+
+export const THEME_KIT_ENVIRONMENT: string =
+  core.getInput('THEME_KIT_ENVIRONMENT', {
+    required: false,
+    trimWhitespace: true,
+  }) || 'development';
+
+export const THEME_KIT_DEPLOY_COMMAND: string = core.getInput(
+  'THEME_KIT_DEPLOY_COMMAND',
+  {
+    required: false,
+    trimWhitespace: true,
+  },
+);
+
+export const SHOPIFY_THEME_ROLE =
+  (core.getInput('SHOPIFY_THEME_ROLE', {
+    required: false,
+    trimWhitespace: true,
+  }) as ThemeRole) || 'development';
 
 export const GITHUB_TOKEN: string = core.getInput('GITHUB_TOKEN', {
   required: true,
