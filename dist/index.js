@@ -94766,11 +94766,12 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     const deleteObject = new dist_cjs.DeleteObjectCommand(input);
     yield s3.send(putObject);
     const src = yield (0,s3_request_presigner_dist_cjs.getSignedUrl)(s3, getObject);
+    core.info(src);
     // Send create theme request
     core.info('Creating theme');
     const response = yield createTheme(Object.assign({ src }, data)).finally(() => upload_zip_awaiter(void 0, void 0, void 0, function* () {
         // Delete zip
-        yield s3.send(deleteObject);
+        // await s3.send(deleteObject);
     }));
     return response.theme.id;
 }));
