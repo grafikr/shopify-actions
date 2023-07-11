@@ -11,6 +11,22 @@ inputs:
     description: "Action to use. Must be 'DEPLOY', 'PREVIEW' or 'DELETE'"
     required: true
 
+  AWS_S3_REGION:
+    description: "AWS region"
+    required: false
+
+  AWS_S3_BUCKET:
+    description: "AWS bucket"
+    required: false
+
+  AWS_S3_ACCESS_KEY_ID:
+    description: "AWS access key id"
+    required: false
+
+  AWS_S3_SECRET_ACCESS_KEY:
+    description: "AWS secret access key"
+    required: false
+
   THEME_KIT_ENVIRONMENT:
     description: "The Theme Kit environment to build theme from. Defaults to 'development'"
     required: false
