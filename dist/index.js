@@ -94414,15 +94414,15 @@ const AWS_S3_REGION = core.getInput('AWS_S3_REGION', {
     required: false,
     trimWhitespace: true,
 });
-const AWS_S3_BUCKET = core.getInput('AWS_S3_REGION', {
+const AWS_S3_BUCKET = core.getInput('AWS_S3_BUCKET', {
     required: false,
     trimWhitespace: true,
 });
-const AWS_S3_ACCESS_KEY_ID = core.getInput('AWS_S3_REGION', {
+const AWS_S3_ACCESS_KEY_ID = core.getInput('AWS_S3_ACCESS_KEY_ID', {
     required: false,
     trimWhitespace: true,
 });
-const AWS_S3_SECRET_ACCESS_KEY = core.getInput('AWS_S3_REGION', {
+const AWS_S3_SECRET_ACCESS_KEY = core.getInput('AWS_S3_SECRET_ACCESS_KEY', {
     required: false,
     trimWhitespace: true,
 });
