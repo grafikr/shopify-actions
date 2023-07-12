@@ -55,7 +55,7 @@ export default async (
     ...data,
   }).finally(async () => {
     // Delete zip
-    // await s3.send(deleteObject);
+    await s3.send(deleteObject);
   });
 
   return response.theme.id;
