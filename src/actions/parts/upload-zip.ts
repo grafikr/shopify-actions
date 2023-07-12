@@ -46,8 +46,6 @@ export default async (
   await s3.send(putObject);
   const src = await getSignedUrl(s3, getObject);
 
-  core.info(src);
-
   // Send create theme request
   core.info('Creating theme');
   const response = await createTheme({
