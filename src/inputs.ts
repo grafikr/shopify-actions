@@ -21,10 +21,13 @@ export const AWS_S3_ACCESS_KEY_ID = core.getInput('AWS_S3_ACCESS_KEY_ID', {
   trimWhitespace: true,
 });
 
-export const AWS_S3_SECRET_ACCESS_KEY = core.getInput('AWS_S3_SECRET_ACCESS_KEY', {
-  required: false,
-  trimWhitespace: true,
-});
+export const AWS_S3_SECRET_ACCESS_KEY = core.getInput(
+  'AWS_S3_SECRET_ACCESS_KEY',
+  {
+    required: false,
+    trimWhitespace: true,
+  },
+);
 
 export const THEME_KIT_ENVIRONMENT: string =
   core.getInput('THEME_KIT_ENVIRONMENT', {

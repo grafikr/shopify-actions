@@ -12,19 +12,19 @@ inputs:
     required: true
 
   AWS_S3_REGION:
-    description: "AWS region"
+    description: 'AWS region'
     required: false
 
   AWS_S3_BUCKET:
-    description: "AWS bucket"
+    description: 'AWS bucket'
     required: false
 
   AWS_S3_ACCESS_KEY_ID:
-    description: "AWS access key id"
+    description: 'AWS access key id'
     required: false
 
   AWS_S3_SECRET_ACCESS_KEY:
-    description: "AWS secret access key"
+    description: 'AWS secret access key'
     required: false
 
   THEME_KIT_ENVIRONMENT:
