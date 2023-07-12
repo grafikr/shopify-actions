@@ -2,9 +2,7 @@ import * as core from '@actions/core';
 import axios, { AxiosError } from 'axios';
 import { THEME_KIT_ENVIRONMENT } from '../inputs';
 import transformPattern from './transformPattern';
-import {
-  Asset, Theme, CreateTheme, UpdateTheme,
-} from '../types/shopify';
+import { Asset, Theme, CreateTheme, UpdateTheme } from '../types/shopify';
 import themekitConfig from './config';
 import { isThemeKitToken, shopifyBaseURL, themeKitBaseURL } from './themekit';
 
@@ -21,9 +19,11 @@ const client = axios.create({
     'X-Shopify-Access-Token': environment.password,
     'Content-Type': 'application/json',
     Accept: 'application/json',
-    ...isThemeKitEnvironment ? {
-      'X-Shopify-Shop': environment.store,
-    } : {},
+    ...(isThemeKitEnvironment
+      ? {
+          'X-Shopify-Shop': environment.store,
+        }
+      : {}),
   },
 });
 
@@ -42,7 +42,9 @@ client.interceptors.response.use(undefined, (error: AxiosError) => {
     } else if (response.status >= 500) {
       delay = 5000;
     } else {
-      core.error(`Request to ${config.url} failed with status code ${response.status}`);
+      core.error(
+        `Request to ${config.url} failed with status code ${response.status}`,
+      );
 
       if (typeof response.data === 'string') {
         core.error(response.data);
@@ -67,18 +69,29 @@ client.interceptors.response.use(undefined, (error: AxiosError) => {
   return timeout.then(() => axios(config));
 });
 
-export const getTheme = async (id: number): Promise<Theme | null> => client.get(`themes/${id}.json`)
-  .then((response) => response.data as Theme)
-  .catch(() => null);
+export const getTheme = async (id: number): Promise<Theme | null> =>
+  client
+    .get(`themes/${id}.json`)
+    .then((response) => response.data as Theme)
+    .catch(() => null);
 
-export const updateTheme = async (id: number, data: UpdateTheme): Promise<Theme> => client.put(`themes/${id}.json`, { theme: data })
-  .then((response) => response.data as Theme);
+export const updateTheme = async (
+  id: number,
+  data: UpdateTheme,
+): Promise<Theme> =>
+  client
+    .put(`themes/${id}.json`, { theme: data })
+    .then((response) => response.data as Theme);
 
-export const createTheme = async (data: CreateTheme) => client.post('themes.json', {
-  theme: data,
-}).then((response) => response.data as { theme: Theme });
+export const createTheme = async (data: CreateTheme) =>
+  client
+    .post('themes.json', {
+      theme: data,
+    })
+    .then((response) => response.data as { theme: Theme });
 
-export const deleteTheme = async (id: number) => client.delete(`themes/${id}.json`);
+export const deleteTheme = async (id: number) =>
+  client.delete(`themes/${id}.json`);
 
 export const getThemeAssets = async (id: number) => {
   const response = await client.get(`themes/${id}/assets.json`);
@@ -115,6 +128,8 @@ export const getIgnoredAssets = async (id: number, patterns: string[]) => {
   return Promise.all(promises);
 };
 
-export const getPreviewURL = (id: number) => `https://${environment.store}?preview_theme_id=${id}`;
+export const getPreviewURL = (id: number) =>
+  `https://${environment.store}?preview_theme_id=${id}`;
 
-export const getCustomizeURL = (id: number) => `https://${environment.store}/admin/themes/${id}/editor`;
+export const getCustomizeURL = (id: number) =>
+  `https://${environment.store}/admin/themes/${id}/editor`;
