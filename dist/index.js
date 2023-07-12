@@ -94771,7 +94771,7 @@ var upload_zip_awaiter = (undefined && undefined.__awaiter) || function (thisArg
     core.info('Creating theme');
     const response = yield createTheme(Object.assign({ src }, data)).finally(() => upload_zip_awaiter(void 0, void 0, void 0, function* () {
         // Delete zip
-        // await s3.send(deleteObject);
+        yield s3.send(deleteObject);
     }));
     return response.theme.id;
 }));
@@ -94864,7 +94864,7 @@ var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || functi
 
 
 /* harmony default export */ const create_zip_from_build = (() => create_zip_from_build_awaiter(void 0, void 0, void 0, function* () {
-    return new Promise((resolve) => create_zip_from_build_awaiter(void 0, void 0, void 0, function* () {
+    return new Promise((resolve) => {
         core.info(`Creating zip file from directory "${BUILD_DIR}"`);
         const zip = lib_default().createWriteStream('build.zip');
         const archive = archiver_default()('zip', { zlib: { level: 9 } });
@@ -94873,8 +94873,8 @@ var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || functi
             resolve(external_path_default().resolve('build.zip'));
         });
         archive.directory(BUILD_DIR, false);
-        yield archive.finalize();
-    }));
+        archive.finalize();
+    });
 }));
 
 ;// CONCATENATED MODULE: ./src/actions/parts/rename-theme.ts
