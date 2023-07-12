@@ -94864,13 +94864,17 @@ var create_zip_from_build_awaiter = (undefined && undefined.__awaiter) || functi
 
 
 /* harmony default export */ const create_zip_from_build = (() => create_zip_from_build_awaiter(void 0, void 0, void 0, function* () {
-    core.info(`Creating zip file from directory "${BUILD_DIR}"`);
-    const zip = lib_default().createWriteStream('build.zip');
-    const archive = archiver_default()('zip', { zlib: { level: 9 } });
-    archive.pipe(zip);
-    archive.directory(BUILD_DIR, false);
-    yield archive.finalize();
-    return external_path_default().resolve('build.zip');
+    return new Promise((resolve) => create_zip_from_build_awaiter(void 0, void 0, void 0, function* () {
+        core.info(`Creating zip file from directory "${BUILD_DIR}"`);
+        const zip = lib_default().createWriteStream('build.zip');
+        const archive = archiver_default()('zip', { zlib: { level: 9 } });
+        archive.pipe(zip);
+        zip.on('close', () => {
+            resolve(external_path_default().resolve('build.zip'));
+        });
+        archive.directory(BUILD_DIR, false);
+        yield archive.finalize();
+    }));
 }));
 
 ;// CONCATENATED MODULE: ./src/actions/parts/rename-theme.ts
