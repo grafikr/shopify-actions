@@ -21,6 +21,6 @@ jobs:
       - name: Deploy themes
         uses: grafikr/shopify-actions@v1
         with:
-          ACTION: "DEPLOY"
+          ACTION: 'DEPLOY'
           THEME_KIT_DEPLOY_COMMAND: "--env='*-production' --allow-live"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

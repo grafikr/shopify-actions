@@ -1,4 +1,5 @@
-const ARGUMENTS_SEPARATION_REGEX = /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^/\\]*(?:\\[\S\s][^/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g;
+const ARGUMENTS_SEPARATION_REGEX =
+  /((?:"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'|\/[^/\\]*(?:\\[\S\s][^/\\]*)*\/[gimy]*(?=\s|$)|(?:\\\s|\S))+)(?=\s|$)/g;
 const ARGUMENT_SEPARATION_REGEX = /([^=\s]+)=?\s*(.*)/;
 
 export default (args: string): {} => {
@@ -8,7 +9,7 @@ export default (args: string): {} => {
     const parsedArgs = arg.match(ARGUMENT_SEPARATION_REGEX);
     parsedArgs.splice(0, 1);
 
-    const [key, value] : string[] = parsedArgs;
+    const [key, value]: string[] = parsedArgs;
 
     let parsedKey: string;
     if (key.indexOf('-') === 0) {

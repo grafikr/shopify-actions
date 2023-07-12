@@ -20,5 +20,5 @@ jobs:
       - name: Deploy theme
         uses: grafikr/shopify-actions@v1
         with:
-          ACTION: "PREVIEW"
+          ACTION: 'PREVIEW'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This value is by default available. No need to create a token.
