@@ -5,7 +5,7 @@ import path from 'path';
 import { BUILD_DIR } from '../../inputs';
 
 export default async (): Promise<string> => {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     core.info(`Creating zip file from directory "${BUILD_DIR}"`);
 
     const zip = fs.createWriteStream('build.zip');
@@ -17,6 +17,6 @@ export default async (): Promise<string> => {
     });
 
     archive.directory(BUILD_DIR, false);
-    await archive.finalize();
+    archive.finalize();
   });
 };
