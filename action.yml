@@ -1,22 +1,38 @@
-name: "Shopify Theme Kit Actions"
-description: "A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores."
-author: "Grafikr"
+name: 'Shopify Theme Kit Actions'
+description: 'A opinionated set of Github Actions to automatically create/push/preview themes on Shopify stores.'
+author: 'Grafikr'
 
 branding:
-  icon: "shopping-cart"
-  color: "green"
+  icon: 'shopping-cart'
+  color: 'green'
 
 inputs:
   ACTION:
     description: "Action to use. Must be 'DEPLOY', 'PREVIEW' or 'DELETE'"
     required: true
 
+  AWS_S3_REGION:
+    description: 'AWS region'
+    required: false
+
+  AWS_S3_BUCKET:
+    description: 'AWS bucket'
+    required: false
+
+  AWS_S3_ACCESS_KEY_ID:
+    description: 'AWS access key id'
+    required: false
+
+  AWS_S3_SECRET_ACCESS_KEY:
+    description: 'AWS secret access key'
+    required: false
+
   THEME_KIT_ENVIRONMENT:
     description: "The Theme Kit environment to build theme from. Defaults to 'development'"
     required: false
 
   THEME_KIT_DEPLOY_COMMAND:
-    description: "The Theme Kit command you want to use to deploy themes"
+    description: 'The Theme Kit command you want to use to deploy themes'
     required: false
 
   SHOPIFY_THEME_ROLE:
@@ -24,7 +40,7 @@ inputs:
     required: false
 
   GITHUB_TOKEN:
-    description: "Github authentication token"
+    description: 'Github authentication token'
     required: true
 
   BUILD_DIR:
@@ -33,14 +49,14 @@ inputs:
 
 outputs:
   SHOPIFY_THEME_ID:
-    description: "The created themes ID"
+    description: 'The created themes ID'
 
   SHOPIFY_THEME_PREVIEW_URL:
-    description: "The created themes preview URL"
+    description: 'The created themes preview URL'
 
   SHOPIFY_THEME_CUSTOMIZE_URL:
-    description: "The created themes customize URL"
+    description: 'The created themes customize URL'
 
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: 'node16'
+  main: 'dist/index.js'

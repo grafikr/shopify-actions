@@ -11,5 +11,5 @@ jobs:
       - name: Delete theme
         uses: grafikr/shopify-actions@v1
         with:
-          ACTION: "DELETE"
+          ACTION: 'DELETE'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
