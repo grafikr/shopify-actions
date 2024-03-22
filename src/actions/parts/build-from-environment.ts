@@ -2,12 +2,10 @@ import * as core from '@actions/core';
 import fs from 'fs-extra';
 import config from '../../helpers/config';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../../inputs';
-import { getIgnoredAssets } from '../../helpers/shopify';
+import { download } from '../../helpers/themekit';
 
 export default async (): Promise<void> => {
   const environment = config[THEME_KIT_ENVIRONMENT];
-  const themeId = parseInt(environment.theme_id, 10);
-  const ignoredFiles = environment.ignore_files;
 
   // Copy existing source directory
   core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
@@ -19,12 +17,6 @@ export default async (): Promise<void> => {
 
   // Copy ignored files from environment
   if (environment.ignore_files) {
-    const assets = await getIgnoredAssets(themeId, ignoredFiles);
-
-    assets.forEach((asset) => {
-      core.info(`Copying asset with key "${asset.key}" to "${BUILD_DIR}"`);
-
-      fs.outputFileSync(`${BUILD_DIR}/${asset.key}`, asset.value);
-    });
+    await download(environment.ignore_files, `--no-ignore --dir="${BUILD_DIR}"`);
   }
 };

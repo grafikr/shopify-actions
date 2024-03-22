@@ -1,6 +1,5 @@
 import * as github from '@actions/github';
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types';
+import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import { GITHUB_TOKEN } from '../inputs';
 
 const octokit = github.getOctokit(GITHUB_TOKEN);
