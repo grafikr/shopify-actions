@@ -109625,7 +109625,7 @@ const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const download = (files, args) => __awaiter(void 0, void 0, void 0, function* () {
-    yield themekit_default().command(`download ${files.join(' ')}`, parse_args(args));
+    yield themekit_default().command(`download ${files.map((file) => `"${file}"`).join(' ')}`, parse_args(args));
 });
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
