@@ -109624,8 +109624,8 @@ const deploy = (args) => __awaiter(void 0, void 0, void 0, function* () {
         core.info(e);
     }
 });
-const download = (args) => __awaiter(void 0, void 0, void 0, function* () {
-    yield themekit_default().command('download', parse_args(args));
+const download = (files, args) => __awaiter(void 0, void 0, void 0, function* () {
+    yield themekit_default().command(`download ${files.join(' ')}`, parse_args(args));
 });
 
 ;// CONCATENATED MODULE: ./src/actions/deploy.ts
@@ -109766,9 +109766,7 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     });
     // Copy ignored files from environment
     if (environment.ignore_files) {
-        let args = environment.ignore_files.join(' ');
-        args += ` --no-ignore --dir="${BUILD_DIR}"`;
-        yield download(args);
+        yield download(environment.ignore_files, `--no-ignore --dir="${BUILD_DIR}"`);
     }
 }));
 
