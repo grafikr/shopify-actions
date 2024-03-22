@@ -39,6 +39,6 @@ export const deploy = async (args: string) => {
   }
 };
 
-export const download = async (args: string) => {
-  await themeKit.command('download', parseArgs(args));
+export const download = async (files: string[], args: string) => {
+  await themeKit.command(`download ${files.join(' ')}`, parseArgs(args));
 };
