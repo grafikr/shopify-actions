@@ -94509,8 +94509,8 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 const environment = helpers_config[THEME_KIT_ENVIRONMENT];
 const isThemeKitToken = (token) => token.startsWith('shptka_');
-const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2022-04/';
-const shopifyBaseURL = (store) => `https://${store}/admin/api/2022-04/`;
+const themeKitBaseURL = () => 'https://theme-kit-access.shopifyapps.com/cli/admin/api/2024-07/';
+const shopifyBaseURL = (store) => `https://${store}/admin/api/2024-07/`;
 const deployTheme = (themeID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield themekit_default().command('deploy', {
