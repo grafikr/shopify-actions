@@ -1,9 +1,9 @@
 import * as core from '@actions/core';
 import fs from 'fs-extra';
+import path from 'path';
 import config from '../../helpers/config';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../../inputs';
-import {getIgnoredAssets, themeDirectories} from '../../helpers/shopify';
-import path from "path";
+import { getIgnoredAssets, themeDirectories } from '../../helpers/shopify';
 
 export default async (): Promise<void> => {
   const environment = config[THEME_KIT_ENVIRONMENT];
@@ -11,19 +11,24 @@ export default async (): Promise<void> => {
   const ignoredFiles = environment.ignore_files;
   const directory = environment.directory ?? './';
 
+  if (themeDirectories.includes(BUILD_DIR)) {
+    core.error(
+      'BUILD_DIR cannot be the same as one of the default Shopify theme directories',
+    );
+  }
+
   // Copy existing source directory
   core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
 
   fs.emptyDirSync(BUILD_DIR);
-
-  themeDirectories.forEach((folder) => {
-    fs.copySync(path.join(directory, folder), BUILD_DIR, {
-      filter: (src) => {
-        core.info(`Src: ${src}`)
-
-        return !src.includes('node_modules')
+  themeDirectories.forEach((themeDirectory) => {
+    fs.copySync(
+      path.join(directory, themeDirectory),
+      path.join(BUILD_DIR, themeDirectory),
+      {
+        filter: (src) => !src.includes('node_modules'),
       },
-    });
+    );
   });
 
   // Copy ignored files from environment
