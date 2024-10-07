@@ -14,7 +14,11 @@ export default async (): Promise<void> => {
 
   fs.emptyDirSync(BUILD_DIR);
   fs.copySync(environment.directory, BUILD_DIR, {
-    filter: (src) => !src.includes('node_modules'),
+    filter: (src) => {
+      core.info(`Src: ${src}`)
+
+      return !src.includes('node_modules')
+    },
   });
 
   // Copy ignored files from environment
