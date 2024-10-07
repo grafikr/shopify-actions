@@ -8,12 +8,13 @@ export default async (): Promise<void> => {
   const environment = config[THEME_KIT_ENVIRONMENT];
   const themeId = parseInt(environment.theme_id, 10);
   const ignoredFiles = environment.ignore_files;
+  const directory = environment.directory ?? './';
 
   // Copy existing source directory
-  core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
+  core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
 
   fs.emptyDirSync(BUILD_DIR);
-  fs.copySync(environment.directory, BUILD_DIR, {
+  fs.copySync(directory, BUILD_DIR, {
     filter: (src) => {
       core.info(`Src: ${src}`)
 
