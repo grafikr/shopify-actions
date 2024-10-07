@@ -112770,6 +112770,15 @@ const getIgnoredAssets = (id, patterns) => shopify_awaiter(void 0, void 0, void 
 });
 const getPreviewURL = (id) => `https://${shopify_environment.store}?preview_theme_id=${id}`;
 const getCustomizeURL = (id) => `https://${shopify_environment.store}/admin/themes/${id}/editor`;
+const themeDirectories = [
+    'assets',
+    'config',
+    'layout',
+    'locales',
+    'sections',
+    'snippets',
+    'templates',
+];
 
 // EXTERNAL MODULE: ./node_modules/.pnpm/fs-extra@11.2.0/node_modules/fs-extra/lib/index.js
 var lib = __nccwpck_require__(99863);
@@ -112789,6 +112798,7 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
 
 
 
+
 /* harmony default export */ const build_from_environment = (() => build_from_environment_awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const environment = helpers_config[THEME_KIT_ENVIRONMENT];
@@ -112798,11 +112808,13 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     // Copy existing source directory
     core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
-    lib_default().copySync(directory, BUILD_DIR, {
-        filter: (src) => {
-            core.info(`Src: ${src}`);
-            return !src.includes('node_modules');
-        },
+    themeDirectories.forEach((folder) => {
+        lib_default().copySync(external_path_default().join(directory, folder), BUILD_DIR, {
+            filter: (src) => {
+                core.info(`Src: ${src}`);
+                return !src.includes('node_modules');
+            },
+        });
     });
     // Copy ignored files from environment
     if (environment.ignore_files) {
