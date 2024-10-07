@@ -112805,15 +112805,15 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     const themeId = parseInt(environment.theme_id, 10);
     const ignoredFiles = environment.ignore_files;
     const directory = (_a = environment.directory) !== null && _a !== void 0 ? _a : './';
+    if (themeDirectories.includes(BUILD_DIR)) {
+        core.error('BUILD_DIR cannot be the same as one of the default Shopify theme directories');
+    }
     // Copy existing source directory
     core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
-    themeDirectories.forEach((folder) => {
-        lib_default().copySync(external_path_default().join(directory, folder), BUILD_DIR, {
-            filter: (src) => {
-                core.info(`Src: ${src}`);
-                return !src.includes('node_modules');
-            },
+    themeDirectories.forEach((themeDirectory) => {
+        lib_default().copySync(external_path_default().join(directory, themeDirectory), external_path_default().join(BUILD_DIR, themeDirectory), {
+            filter: (src) => !src.includes('node_modules'),
         });
     });
     // Copy ignored files from environment
