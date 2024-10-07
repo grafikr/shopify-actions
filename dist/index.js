@@ -112527,7 +112527,7 @@ const SHOPIFY_THEME_ROLE = core.getInput('SHOPIFY_THEME_ROLE', {
 const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN', {
     required: true,
 });
-const BUILD_DIR = core.getInput('GITHUB_TOKEN', {
+const BUILD_DIR = core.getInput('BUILD_DIR', {
     required: false,
     trimWhitespace: true,
 }) || 'build';
