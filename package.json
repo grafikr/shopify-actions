@@ -6,29 +6,29 @@
     "format": "prettier . --write"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@actions/github": "^5.0.0",
-    "@aws-sdk/client-s3": "^3.369.0",
-    "@aws-sdk/s3-request-presigner": "^3.369.0",
-    "@shopify/themekit": "^1.0.0",
-    "@types/archiver": "^5.0.0",
-    "@types/fs-extra": "^11.0.0",
-    "@vercel/ncc": "^0.36.0",
-    "archiver": "^5.0.0",
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^5.1.1",
+    "@aws-sdk/client-s3": "^3.665.0",
+    "@aws-sdk/s3-request-presigner": "^3.665.0",
+    "@shopify/themekit": "^1.1.10",
+    "@types/archiver": "^5.3.4",
+    "@types/fs-extra": "^11.0.4",
+    "@vercel/ncc": "^0.36.1",
+    "archiver": "^5.3.2",
     "axios": "^0.27.2",
-    "eslint-config-prettier": "^8.8.0",
-    "fs-extra": "^11.0.0",
-    "yaml": "^2.0.0"
+    "eslint-config-prettier": "^8.10.0",
+    "fs-extra": "^11.2.0",
+    "yaml": "^2.5.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.59.2",
-    "@typescript-eslint/parser": "^5.59.2",
-    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-import-resolver-webpack": "^0.13.0",
-    "eslint-plugin-import": "^2.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-import-resolver-webpack": "^0.13.9",
+    "eslint-plugin-import": "^2.31.0",
     "prettier": "3.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.6.2"
   }
 }
