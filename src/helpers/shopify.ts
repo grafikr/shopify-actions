@@ -133,3 +133,13 @@ export const getPreviewURL = (id: number) =>
 
 export const getCustomizeURL = (id: number) =>
   `https://${environment.store}/admin/themes/${id}/editor`;
+
+export const themeDirectories = [
+  'assets',
+  'config',
+  'layout',
+  'locales',
+  'sections',
+  'snippets',
+  'templates',
+];

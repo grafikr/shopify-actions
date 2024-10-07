@@ -2,7 +2,8 @@ import * as core from '@actions/core';
 import fs from 'fs-extra';
 import config from '../../helpers/config';
 import { BUILD_DIR, THEME_KIT_ENVIRONMENT } from '../../inputs';
-import { getIgnoredAssets } from '../../helpers/shopify';
+import {getIgnoredAssets, themeDirectories} from '../../helpers/shopify';
+import path from "path";
 
 export default async (): Promise<void> => {
   const environment = config[THEME_KIT_ENVIRONMENT];
@@ -14,12 +15,15 @@ export default async (): Promise<void> => {
   core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
 
   fs.emptyDirSync(BUILD_DIR);
-  fs.copySync(directory, BUILD_DIR, {
-    filter: (src) => {
-      core.info(`Src: ${src}`)
 
-      return !src.includes('node_modules')
-    },
+  themeDirectories.forEach((folder) => {
+    fs.copySync(path.join(directory, folder), BUILD_DIR, {
+      filter: (src) => {
+        core.info(`Src: ${src}`)
+
+        return !src.includes('node_modules')
+      },
+    });
   });
 
   // Copy ignored files from environment
