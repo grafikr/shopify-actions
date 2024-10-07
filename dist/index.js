@@ -112797,7 +112797,10 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
     core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
     lib_default().copySync(environment.directory, BUILD_DIR, {
-        filter: (src) => !src.includes('node_modules'),
+        filter: (src) => {
+            core.info(`Src: ${src}`);
+            return !src.includes('node_modules');
+        },
     });
     // Copy ignored files from environment
     if (environment.ignore_files) {
