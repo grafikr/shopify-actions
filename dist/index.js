@@ -112790,13 +112790,15 @@ var build_from_environment_awaiter = (undefined && undefined.__awaiter) || funct
 
 
 /* harmony default export */ const build_from_environment = (() => build_from_environment_awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const environment = helpers_config[THEME_KIT_ENVIRONMENT];
     const themeId = parseInt(environment.theme_id, 10);
     const ignoredFiles = environment.ignore_files;
+    const directory = (_a = environment.directory) !== null && _a !== void 0 ? _a : './';
     // Copy existing source directory
-    core.info(`Copying directory "${environment.directory}" to "${BUILD_DIR}"`);
+    core.info(`Copying directory "${directory}" to "${BUILD_DIR}"`);
     lib_default().emptyDirSync(BUILD_DIR);
-    lib_default().copySync(environment.directory, BUILD_DIR, {
+    lib_default().copySync(directory, BUILD_DIR, {
         filter: (src) => {
             core.info(`Src: ${src}`);
             return !src.includes('node_modules');
